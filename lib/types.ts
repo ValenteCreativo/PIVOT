@@ -36,7 +36,7 @@ export type MentorReport = {
   novelty: { direct: string[]; adjacent: string[]; wedge: string; judgment: string };
   adoption: { user: string; payer: string; why: string; first100: string };
   feasibility: string[];
-  sponsorFit: { name: string; fit: 'NATURAL' | 'POSSIBLE' | 'FORCED'; reason: string }[];
+  sponsorFit: { name: string; fit: 'NATURAL' | 'POSSIBLE' | 'FORCED' | 'UNKNOWN'; reason: string }[];
   pivot: string;
   mvp: string[];
   doNotBuild: string[];

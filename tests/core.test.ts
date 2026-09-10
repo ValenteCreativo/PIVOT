@@ -1,54 +1,94 @@
 import { afterEach,describe,expect,it,vi } from 'vitest';
-import { nearMissFor, normalizeScore, verdictFor } from '@/lib/scoring';
-import { analysisInputSchema, CANONICAL_DIMENSION_KEYS, mentorInferenceJsonSchema, parseModelJson } from '@/lib/schemas';
+import { buildLiveMentorReport, assertScoringInvariants } from '@/lib/report-builder';
+import { nearMissFor, normalizeScore, verdictFor, WEIGHTS } from '@/lib/scoring';
+import { analysisInputSchema, CANONICAL_DIMENSION_KEYS, mentorInferenceJsonSchema, parseModelJson, type MentorModelAssessment } from '@/lib/schemas';
+import type { MentorReport, ResearchRound } from '@/lib/types';
 import { detectMode } from '@/providers/mode';
 import { DemoResearchProvider } from '@/providers/research/demo';
 import { IdempotencyCache, withRetry } from '@/workflows/retry';
 import { CHILD_TASK_RETRY, ORCHESTRATOR_RETRY } from '@/workflows/retry-policy';
 import { NebiusInferenceProvider } from '@/providers/inference/nebius';
 
+function assessment(overrides:Partial<MentorModelAssessment>={}):MentorModelAssessment {
+  return {
+    confidence:75,summary:'A focused team ritual with a visible outcome.',
+    dimensions:CANONICAL_DIMENSION_KEYS.map(key=>({key,score:Math.round(WEIGHTS[key]*.7),max:WEIGHTS[key],note:`Target-project judgment for ${key}`})),
+    strengths:['The shared finish is visually demonstrable.'],weaknesses:['Repeat use is not yet proven.'],uncertainties:['No direct user interviews.'],
+    novelty:{direct:['Virtual coworking rooms'],adjacent:['Team timers'],wedge:'A shared completion race',judgment:'The workflow combination is differentiated.'},
+    adoption:{user:'Remote product teams',payer:'Team leads',why:'It turns a stalled task into a shared commitment.',first100:'Recruit remote teams from product communities.'},
+    feasibility:['Build a synchronized room and task state.'],sponsorFit:[{name:'Hackathon sponsors',fit:'UNKNOWN',reason:'Sponsor evidence was unavailable.'}],
+    pivot:'A 25-minute focus sprint with one committed task per teammate.',mvp:['Create a room','Commit one task','Run a shared timer','Show completion'],
+    doNotBuild:['A full project-management suite'],stack:['TypeScript web app','Realtime room state','Lightweight persistence'],
+    plan:[{time:'0–6h',milestone:'Build room creation and task commitments.'}],demoPlan:[{time:'0–60s',beat:'Run one team sprint and show the shared completion.'}],
+    hardTruth:'A timer alone will not retain teams.',nextValidation:['Run five facilitated team sessions.'],...overrides,
+  };
+}
+
+const emptyResearch:ResearchRound[]=[{round:1,focus:'hackathon',queries:['tracks'],findings:[],gaps:['Sponsor details unavailable']}];
+
 afterEach(()=>vi.restoreAllMocks());
 
 describe('mentor scoring',()=>{
   it('normalizes and clamps dimension scores',()=>expect(normalizeScore([{key:'Evidence',score:12,max:8,note:''}])).toBe(8));
-  it('uses confidence and evidence to temper verdicts',()=>{expect(verdictFor(84,80,70)).toBe('ALL IN');expect(verdictFor(84,40,30)).toBe('DOUBLE DOWN')});
+  it('uses deterministic score-only verdict boundaries',()=>{expect(verdictFor(79)).toBe('DOUBLE DOWN');expect(verdictFor(80)).toBe('ALL IN');expect(verdictFor(59)).toBe('PIVOT')});
   it('calculates constructive near misses',()=>expect(nearMissFor(77,'DOUBLE DOWN')).toEqual({nextVerdict:'ALL IN',points:3}));
+  it('derives score, edges, verdict, and near miss from canonical dimensions',()=>{
+    const dimensions=assessment().dimensions.map(d=>({...d,score:d.max*.79}));
+    const report=buildLiveMentorReport({idea:'A multiplayer focus room where remote teams race to finish one task together.'},emptyResearch,assessment({dimensions}));
+    expect(report.score).toBe(79);expect(report.verdict).toBe('DOUBLE DOWN');expect(report.nearMiss).toMatchObject({nextVerdict:'ALL IN',points:1});expect(()=>assertScoringInvariants(report)).not.toThrow();
+  });
+  it('rejects the exact contradictory live-run scoring combination',()=>{
+    const report=buildLiveMentorReport({idea:'A multiplayer focus room where remote teams race to finish one task together.'},emptyResearch,assessment()) as MentorReport;
+    const inconsistent={...report,score:47,hackathonEdge:82,realWorldEdge:77,verdict:'DOUBLE DOWN' as const,nearMiss:{nextVerdict:'ALL IN' as const,points:1,moves:[]}};
+    expect(()=>assertScoringInvariants(inconsistent)).toThrow(/invariant failed/);
+  });
 });
+
+describe('target-project isolation',()=>{
+  it('removes the exact PIVOT implementation contamination and preserves strong project analysis',()=>{
+    const contaminated=assessment({
+      summary:'Remote teams can make one shared task completion visible.',hardTruth:'Without completion proof this is only a timer.',pivot:'Require one task commitment and visible completion proof.',
+      dimensions:assessment().dimensions.map(d=>({...d,note:`Strong analysis of the focus-room project: ${d.key}`})),
+      adoption:{user:'Remote product teams',payer:'Team leads',why:'They need a focused team ritual.',first100:'Pull the lever for hackathon teams and show research rounds.'},
+      feasibility:['Use Nebius structured inference and Render Workflow retries.'],
+      sponsorFit:[{name:'Linkup',fit:'NATURAL',reason:'PIVOT uses it for research.'},{name:'Nebius',fit:'NATURAL',reason:'PIVOT uses it for inference.'},{name:'Render',fit:'NATURAL',reason:'PIVOT uses its workflow.'}],
+      mvp:['Two-pass evidence research','Structured ten-dimension verdict'],stack:['Linkup search adapter','Nebius structured inference','Render Workflow orchestration'],
+      doNotBuild:['Do not change the PIVOT casino UI'],plan:[{time:'0–8h',milestone:'Build the PIVOT research rounds.'}],demoPlan:[{time:'0–60s',beat:'Pull the lever and reveal the verdict.'}],
+    });
+    const report=buildLiveMentorReport({idea:'A multiplayer focus room where remote teams race to finish one task together.',hackathonUrl:'https://example.com/hackathon'},emptyResearch,contaminated);
+    const ancillary=JSON.stringify({adoption:report.adoption,feasibility:report.feasibility,sponsorFit:report.sponsorFit,mvp:report.mvp,stack:report.stack,doNotBuild:report.doNotBuild,plan:report.plan,demoPlan:report.demoPlan});
+    expect(ancillary).not.toMatch(/PIVOT|Linkup|Nebius|Render Workflow|pull the lever|research rounds|ten-dimension/i);
+    expect(report.sponsorFit).toEqual([{name:'Hackathon sponsors',fit:'UNKNOWN',reason:'Sponsor and track information could not be verified from the available target-hackathon evidence.'}]);
+    expect(report.originalIdea).toBe('A multiplayer focus room where remote teams race to finish one task together.');
+    expect(report.summary).toBe(contaminated.summary);expect(report.hardTruth).toBe(contaminated.hardTruth);expect(report.pivot).toBe(contaminated.pivot);expect(report.dimensions[0].note).toBe(contaminated.dimensions[0].note);
+  });
+});
+
 describe('providers and schemas',()=>{
   it('detects explicit and automatic modes',()=>{expect(detectMode({APP_MODE:'demo'})).toBe('demo');expect(detectMode({LINKUP_API_KEY:'x',NEBIUS_API_KEY:'y'})).toBe('live')});
   it('rejects underspecified input',()=>expect(()=>analysisInputSchema.parse({idea:'tiny'})).toThrow());
-  it('parses fenced structured model output',()=>{const body={score:50,confidence:60,summary:'x',dimensions:['Problem clarity','User specificity','Novelty','Feasibility','Hackathon scope','Demoability','Sponsor fit','Adoption','Impact','Evidence'].map(key=>({key,score:5,max:10,note:'x'})),strengths:['x'],weaknesses:['x'],uncertainties:[],pivot:'x',hardTruth:'x'};expect(parseModelJson('```json\n'+JSON.stringify(body)+'\n```').score).toBe(50)});
-  it('normalizes the malformed GLM dimension labels and explanatory fields from the Render run',()=>{
+  it('parses fenced structured model output',()=>expect(parseModelJson('```json\n'+JSON.stringify(assessment())+'\n```').summary).toContain('focused'));
+  it('normalizes malformed GLM labels and explanatory fields from the Render run',()=>{
     const keys=['problem clarity','User-Specificity','NOVELTY','Real-world feasibility','Hackathon Scope (12 pts)','Demo Ability','Sponsor / Track Fit','Business & Adoption Model','Impact / Utility','Evidence Quality'];
     const dimensions=keys.map((key,index)=>index===9?{key,score:5,max:8}:{key,score:5,max:index===1||index===8?8:index===2||index===3||index===4?12:10,rationale:`Why ${key} scored this way`});
-    const parsed=parseModelJson(JSON.stringify({score:55,confidence:70,summary:'Specific assessment',dimensions,strengths:['Scoped'],weaknesses:['Evidence gap'],uncertainties:[],pivot:'Narrow the workflow',hardTruth:'Validate demand'}));
-    expect(parsed.dimensions.map(d=>d.key)).toEqual([...CANONICAL_DIMENSION_KEYS]);
-    expect(parsed.dimensions[0].note).toBe('Why problem clarity scored this way');
-    expect(parsed.dimensions[9].note).toBe('Scored 5 of 8; the model supplied no additional explanation.');
+    const parsed=parseModelJson(JSON.stringify(assessment({dimensions:dimensions as MentorModelAssessment['dimensions']})));
+    expect(parsed.dimensions.map(d=>d.key)).toEqual([...CANONICAL_DIMENSION_KEYS]);expect(parsed.dimensions[0].note).toBe('Why problem clarity scored this way');expect(parsed.dimensions[9].note).toBe('Scored 5 of 8; the model supplied no additional explanation.');
   });
-  it('rejects unknown or ambiguous dimension labels',()=>{
-    const dimensions:{key:string;score:number;max:number;note:string}[]=CANONICAL_DIMENSION_KEYS.map(key=>({key,score:5,max:10,note:'reason'}));dimensions[3]={...dimensions[3],key:'Technical magic'};
-    expect(()=>parseModelJson(JSON.stringify({score:50,confidence:70,summary:'x',dimensions,strengths:['x'],weaknesses:['x'],uncertainties:[],pivot:'x',hardTruth:'x'}))).toThrow('Unknown mentor dimension label');
-  });
-  it('requires key, score, max, and note in the provider JSON schema',()=>expect(mentorInferenceJsonSchema.schema.properties.dimensions.items.required).toEqual(['key','score','max','note']));
+  it('rejects unknown or ambiguous dimension labels',()=>{const value=assessment();value.dimensions[3]={...value.dimensions[3],key:'Technical magic' as never};expect(()=>parseModelJson(JSON.stringify(value))).toThrow('Unknown mentor dimension label')});
+  it('requires canonical dimension fields and every target-project section',()=>{expect(mentorInferenceJsonSchema.schema.properties.dimensions.items.required).toEqual(['key','score','max','note']);expect(mentorInferenceJsonSchema.schema.required).toContain('demoPlan');expect(mentorInferenceJsonSchema.schema.required).not.toContain('score')});
   it('requests strict JSON Schema from the environment-selected Nebius model',async()=>{
-    const dimensions=CANONICAL_DIMENSION_KEYS.map(key=>({key,score:5,max:10,note:'Evidence-based reason'}));
-    const content=JSON.stringify({score:50,confidence:70,summary:'x',dimensions,strengths:['x'],weaknesses:['x'],uncertainties:[],pivot:'x',hardTruth:'x'});
-    const fetchMock=vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({choices:[{message:{content}}]}),{status:200,headers:{'Content-Type':'application/json'}}));
+    const content=JSON.stringify(assessment());const fetchMock=vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({choices:[{message:{content}}]}),{status:200,headers:{'Content-Type':'application/json'}}));
     await new NebiusInferenceProvider('secret-not-for-logs','zai-org/GLM-5.3-Flash').evaluate({idea:'A sufficiently detailed test idea'},[]);
-    const request=JSON.parse(String(fetchMock.mock.calls[0][1]?.body));
-    expect(request.model).toBe('zai-org/GLM-5.3-Flash');expect(request.response_format.type).toBe('json_schema');expect(request.response_format.json_schema.strict).toBe(true);
+    const request=JSON.parse(String(fetchMock.mock.calls[0][1]?.body));expect(request.model).toBe('zai-org/GLM-5.3-Flash');expect(request.response_format.type).toBe('json_schema');expect(request.response_format.json_schema.strict).toBe(true);
   });
-  it('logs the raw model response on validation failure without logging the API key',async()=>{
-    const dimensions:{key:string;score:number;max:number;note:string}[]=CANONICAL_DIMENSION_KEYS.map(key=>({key,score:5,max:10,note:'reason'}));dimensions[0]={...dimensions[0],key:'Unrecognized dimension'};
-    const content=JSON.stringify({score:50,confidence:70,summary:'x',dimensions,strengths:['x'],weaknesses:['x'],uncertainties:[],pivot:'x',hardTruth:'x'});
-    vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({choices:[{message:{content}}]}),{status:200,headers:{'Content-Type':'application/json'}}));
-    const errorLog=vi.spyOn(console,'error').mockImplementation(()=>undefined);
-    await expect(new NebiusInferenceProvider('never-log-this-key','model-from-env').evaluate({idea:'A sufficiently detailed test idea'},[])).rejects.toThrow('Unknown mentor dimension label');
-    const logged=JSON.stringify(errorLog.mock.calls);expect(logged).toContain('Unrecognized dimension');expect(logged).not.toContain('never-log-this-key');
+  it('logs raw model output on validation failure without logging the API key',async()=>{
+    const value=assessment();value.dimensions[0]={...value.dimensions[0],key:'Unrecognized dimension' as never};const content=JSON.stringify(value);
+    vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({choices:[{message:{content}}]}),{status:200,headers:{'Content-Type':'application/json'}}));const errorLog=vi.spyOn(console,'error').mockImplementation(()=>undefined);
+    await expect(new NebiusInferenceProvider('never-log-this-key','model-from-env').evaluate({idea:'A sufficiently detailed test idea'},[])).rejects.toThrow('Unknown mentor dimension label');const logged=JSON.stringify(errorLog.mock.calls);expect(logged).toContain('Unrecognized dimension');expect(logged).not.toContain('never-log-this-key');
   });
   it('derives follow-up queries from Round 1 gaps',async()=>{const p=new DemoResearchProvider();const input={idea:'AI climate app'};const one=await p.researchHackathon(input);const gaps=await p.identifyEvidenceGaps(one,input);const two=await p.followUpSearch(gaps,input);expect(two.queries[0]).toContain(gaps[0]);expect(two.round).toBe(2)});
 });
+
 describe('workflow resilience',()=>{
   it('retries a transient failure',async()=>{let calls=0;const result=await withRetry(async()=>{calls++;if(calls===1)throw new Error('503');return'ok'});expect(result).toEqual({value:'ok',attempts:2,recovered:true})});
   it('keeps idempotent results singular',()=>{const cache=new IdempotencyCache<number>();cache.set('run',1);cache.set('run',1);expect(cache.get('run')).toBe(1);expect(cache.size()).toBe(1)});

@@ -12,7 +12,7 @@ export class NebiusInferenceProvider implements MentorInferenceProvider {
   private request(input:AnalysisInput,research:ResearchRound[],responseFormat:ResponseFormat){
     return fetch(`${this.baseUrl.replace(/\/$/,'')}/chat/completions`,{
       method:'POST',headers:{Authorization:`Bearer ${this.apiKey}`,'Content-Type':'application/json'},
-      body:JSON.stringify({model:this.model,response_format:responseFormat,temperature:.15,messages:[{role:'system',content:MENTOR_SYSTEM_PROMPT},{role:'user',content:buildMentorPrompt({input,research})}]})
+      body:JSON.stringify({model:this.model,response_format:responseFormat,temperature:.15,messages:[{role:'system',content:MENTOR_SYSTEM_PROMPT},{role:'user',content:buildMentorPrompt({TARGET_PROJECT:input,TARGET_HACKATHON_RESEARCH:research})}]})
     });
   }
 

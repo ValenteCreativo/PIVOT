@@ -9,7 +9,7 @@ The project comes from repeated experience mentoring roughly 9–10 hackathons. 
 ## What works now
 
 - Complete zero-key Demo Mode with five tailored scenarios, deterministic reports, two research rounds, explicit evidence gaps, fixture-source labeling, and uncertainty.
-- Ten-dimension 100-point rubric with confidence-aware verdicts: FOLD, PIVOT, DOUBLE DOWN, and ALL IN.
+- Ten-dimension 100-point rubric with deterministic verdicts: FOLD, PIVOT, DOUBLE DOWN, and ALL IN.
 - Separate **Hackathon Edge** and **Real-World Edge** scores with transparent dimension weights.
 - Constructive near-miss mechanic that names the changes with the highest expected point impact.
 - Controlled evaluation failure, retry, recovery, and idempotency display for judge demos.
@@ -60,7 +60,7 @@ The UI depends only on domain types, not provider implementations. `APP_MODE=aut
 
 The PIVOT Score is the sum of ten rubric dimensions: problem clarity 10, user specificity 8, novelty 12, real-world feasibility 12, hackathon scope 12, demoability 10, sponsor fit 10, business/adoption 10, impact 8, and evidence 8.
 
-Hackathon Edge averages normalized novelty, feasibility, scope, demoability, and sponsor-fit dimensions. Real-World Edge averages problem clarity, user specificity, feasibility, adoption, impact, and evidence. The verdict tier is then tempered when confidence or evidence coverage is weak.
+Hackathon Edge averages normalized novelty, feasibility, scope, demoability, and sponsor-fit dimensions. Real-World Edge averages problem clarity, user specificity, feasibility, adoption, impact, and evidence. Application code derives the overall score, both edge scores, verdict tier, and near-miss distance from the canonical dimensions; confidence and evidence coverage remain visible risk signals but cannot change those tier boundaries.
 
 ## Live mode
 

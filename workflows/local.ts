@@ -1,9 +1,10 @@
 import type { AnalysisInput, MentorReport } from '@/lib/types';
 import { createResearchProvider } from '@/providers/research';
 import { createInferenceProvider } from '@/providers/inference';
-import { DemoInferenceProvider } from '@/providers/inference/demo';
 import { detectMode } from '@/providers/mode';
 import { saveAnalysis } from '@/persistence/analysis-store';
+import { buildLiveMentorReport } from '@/lib/report-builder';
+import type { MentorModelAssessment } from '@/lib/schemas';
 
 const completed=new Map<string,MentorReport>();
 export async function runAnalysis(input:AnalysisInput,idempotencyKey:string){
@@ -16,6 +17,6 @@ export async function runAnalysis(input:AnalysisInput,idempotencyKey:string){
   const evaluated=await provider.evaluate(input,research);
   let report:MentorReport;
   if(detectMode()==='demo') report=evaluated as MentorReport;
-  else {const baseline=await new DemoInferenceProvider().evaluate(input,research);report={...baseline,...evaluated,analysisId:baseline.analysisId,mode:'live',research};}
+  else report=buildLiveMentorReport(input,research,evaluated as MentorModelAssessment);
   completed.set(idempotencyKey,report);await saveAnalysis(input,report,research);return report;
 }
