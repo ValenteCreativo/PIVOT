@@ -1,0 +1,2 @@
+export async function withRetry<T>(operation:()=>Promise<T>,maxAttempts=3){let last:unknown;for(let attempt=1;attempt<=maxAttempts;attempt++){try{return{value:await operation(),attempts:attempt,recovered:attempt>1};}catch(error){last=error;}}throw last;}
+export class IdempotencyCache<T>{private cache=new Map<string,T>();get(key:string){return this.cache.get(key)}set(key:string,value:T){this.cache.set(key,value);return value}size(){return this.cache.size}}
