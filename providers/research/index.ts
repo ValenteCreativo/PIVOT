@@ -1,0 +1,2 @@
+import { detectMode } from '../mode'; import { DemoResearchProvider } from './demo'; import { LinkupResearchProvider } from './linkup';
+export function createResearchProvider(){const mode=detectMode();if(mode==='live'){if(!process.env.LINKUP_API_KEY)throw new Error('LINKUP_API_KEY is required in live mode');return new LinkupResearchProvider(process.env.LINKUP_API_KEY);}return new DemoResearchProvider();}

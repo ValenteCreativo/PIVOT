@@ -1,0 +1,2 @@
+import { detectMode } from '../mode';import { DemoInferenceProvider } from './demo';import { NebiusInferenceProvider } from './nebius';
+export function createInferenceProvider(){const mode=detectMode();if(mode==='live'){if(!process.env.NEBIUS_API_KEY)throw new Error('NEBIUS_API_KEY is required in live mode');return new NebiusInferenceProvider(process.env.NEBIUS_API_KEY,process.env.NEBIUS_BASE_URL,process.env.NEBIUS_MODEL);}return new DemoInferenceProvider();}
