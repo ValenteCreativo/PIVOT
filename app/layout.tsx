@@ -13,7 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Untitled site',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  title: 'PIVOT! — Hackathon Idea Casino',
+  description: 'Research the hackathon. Stress-test the idea. Find the version worth building.',
+  openGraph: { title:'PIVOT! — Hackathon Idea Casino', description:'Before you spend 36 hours building it, check the odds.', images:[{url:'/og.png',width:1730,height:909,alt:'PIVOT! Check the odds before you build.'}] },
+  twitter: { card:'summary_large_image', title:'PIVOT! — Hackathon Idea Casino', description:'Before you spend 36 hours building it, check the odds.', images:['/og.png'] },
 };
 
 export default function RootLayout({
