@@ -1,2 +1,3 @@
 import PivotApp from '@/components/PivotApp';
-export default function Home(){ return <PivotApp/>; }
+import { detectMode } from '@/providers/mode';
+export default function Home(){ return <PivotApp initialMode={detectMode()}/>; }
