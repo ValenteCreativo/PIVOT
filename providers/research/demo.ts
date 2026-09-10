@@ -17,7 +17,7 @@ export class DemoResearchProvider implements ResearchProvider {
       finding(`${t}-demo`,'Hackathon demo pattern study (curated fixture)','winning hackathon demo patterns','High-performing demos make the before/after visible within the first 40 seconds.','One crisp transformation is more competitive than a feature tour.',86,'Demoability'),
     ], gaps:['No direct evidence that the target user has this problem frequently.','No credible willingness-to-pay or adoption proxy yet.'] };
   }
-  async identifyEvidenceGaps(round:ResearchRound,_input:AnalysisInput) { return round.gaps; }
+  async identifyEvidenceGaps(round:ResearchRound,input:AnalysisInput) { void input; return round.gaps; }
   async followUpSearch(gaps:string[],input:AnalysisInput):Promise<ResearchRound>{
     const t=theme(input.idea);
     return {round:2,focus:'Behavior, adoption, and feasibility gaps from Round 1',queries:gaps.map(g=>`verify: ${g}`),findings:[
