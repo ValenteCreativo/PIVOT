@@ -6,7 +6,7 @@ import type { MentorReport, ResearchRound } from '@/lib/types';
 import { detectMode } from '@/providers/mode';
 import { DemoResearchProvider } from '@/providers/research/demo';
 import { IdempotencyCache, withRetry } from '@/workflows/retry';
-import { CHILD_TASK_RETRY, ORCHESTRATOR_RETRY } from '@/workflows/retry-policy';
+import { CHILD_TASK_RETRY, INFERENCE_TASK_RETRY, ORCHESTRATOR_RETRY } from '@/workflows/retry-policy';
 import { NebiusInferenceProvider } from '@/providers/inference/nebius';
 import { runConfiguredAnalysis } from '@/workflows';
 import { runRenderWorkflow } from '@/workflows/render';
@@ -85,7 +85,20 @@ describe('providers and schemas',()=>{
   it('requests strict JSON Schema from the environment-selected Nebius model',async()=>{
     const content=JSON.stringify(assessment());const fetchMock=vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({choices:[{message:{content}}]}),{status:200,headers:{'Content-Type':'application/json'}}));
     await new NebiusInferenceProvider('secret-not-for-logs','zai-org/GLM-5.3-Flash').evaluate({idea:'A sufficiently detailed test idea'},[]);
-    const request=JSON.parse(String(fetchMock.mock.calls[0][1]?.body));expect(request.model).toBe('zai-org/GLM-5.3-Flash');expect(request.response_format.type).toBe('json_schema');expect(request.response_format.json_schema.strict).toBe(true);
+    const request=JSON.parse(String(fetchMock.mock.calls[0][1]?.body));expect(request.model).toBe('zai-org/GLM-5.3-Flash');expect(request.max_completion_tokens).toBe(12000);expect(request.reasoning_effort).toBe('low');expect(request.response_format.type).toBe('json_schema');expect(request.response_format.json_schema.strict).toBe(true);
+  });
+  it('fails fast when GLM spends the response on reasoning and returns no JSON content',async()=>{
+    const fetchImpl=vi.fn().mockResolvedValue(new Response(JSON.stringify({id:'chatcmpl-length',choices:[{finish_reason:'length',message:{content:'',reasoning_content:'Internal draft that is not the final evaluation.',tool_calls:null}}],usage:{completion_tokens:8192,completion_tokens_details:{reasoning_tokens:8192}}}),{status:200,headers:{'Content-Type':'application/json'}}));
+    const errorLog=vi.spyOn(console,'error').mockImplementation(()=>undefined);
+    await expect(new NebiusInferenceProvider('never-log-this-key','zai-org/GLM-5.3-Flash',undefined,{fetchImpl,wait:async()=>undefined}).evaluate({idea:'A sufficiently detailed test idea'},[])).rejects.toThrow('Model response did not contain JSON');
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    const logged=JSON.stringify(errorLog.mock.calls);expect(logged).toContain('chatcmpl-length');expect(logged).toContain('length');expect(logged).toContain('reasoningLength');expect(logged).not.toContain('never-log-this-key');
+  });
+  it('retries transient Nebius failures but not structured-output validation failures',async()=>{
+    const fetchImpl=vi.fn().mockResolvedValueOnce(new Response('temporarily unavailable',{status:503})).mockResolvedValueOnce(new Response(JSON.stringify({choices:[{finish_reason:'stop',message:{content:JSON.stringify(assessment())}}]}),{status:200,headers:{'Content-Type':'application/json'}}));
+    vi.spyOn(console,'warn').mockImplementation(()=>undefined);
+    const result=await new NebiusInferenceProvider('secret','zai-org/GLM-5.3-Flash',undefined,{fetchImpl,wait:async()=>undefined}).evaluate({idea:'A sufficiently detailed test idea'},[]);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);expect(result.summary).toContain('focused');
   });
   it('logs raw model output on validation failure without logging the API key',async()=>{
     const value=assessment();value.dimensions[0]={...value.dimensions[0],key:'Unrecognized dimension' as never};const content=JSON.stringify(value);
@@ -98,7 +111,7 @@ describe('providers and schemas',()=>{
 describe('workflow resilience',()=>{
   it('retries a transient failure',async()=>{let calls=0;const result=await withRetry(async()=>{calls++;if(calls===1)throw new Error('503');return'ok'});expect(result).toEqual({value:'ok',attempts:2,recovered:true})});
   it('keeps idempotent results singular',()=>{const cache=new IdempotencyCache<number>();cache.set('run',1);cache.set('run',1);expect(cache.get('run')).toBe(1);expect(cache.size()).toBe(1)});
-  it('retries child tasks without retrying the parent orchestration chain',()=>{expect(CHILD_TASK_RETRY.maxRetries).toBe(3);expect(ORCHESTRATOR_RETRY.maxRetries).toBe(0)});
+  it('retries transient child work but not paid inference or the parent chain',()=>{expect(CHILD_TASK_RETRY.maxRetries).toBe(3);expect(INFERENCE_TASK_RETRY.maxRetries).toBe(0);expect(ORCHESTRATOR_RETRY.maxRetries).toBe(0)});
 });
 
 describe('workflow routing',()=>{
