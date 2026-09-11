@@ -7,6 +7,7 @@ import { detectMode } from '../providers/mode';
 import { CHILD_TASK_RETRY, ORCHESTRATOR_RETRY } from '../workflows/retry-policy';
 import { buildLiveMentorReport } from '../lib/report-builder';
 import type { MentorModelAssessment } from '../lib/schemas';
+import { analysisIdFor } from '../lib/idempotency';
 
 type RunEnvelope={analysisId:string;idempotencyKey:string;input:AnalysisInput};
 
@@ -19,7 +20,7 @@ export const generatePivot=task({name:'generate_pivot',retry:CHILD_TASK_RETRY},a
 export const persistReport=task({name:'persist_report',retry:CHILD_TASK_RETRY},async(_ctx,report:MentorReport & {workflowValidated:boolean})=>({report,status:'complete',persistKey:report.analysisId}));
 
 export const runAnalysisWorkflow=task({name:'run_analysis',retry:ORCHESTRATOR_RETRY,timeoutSeconds:1200},async(ctx,input:AnalysisInput,idempotencyKey:string)=>{
-  const payload=await ctx.run(parseInput,{analysisId:crypto.randomUUID(),idempotencyKey,input});
+  const payload=await ctx.run(parseInput,{analysisId:await analysisIdFor(idempotencyKey),idempotencyKey,input});
   const researched=await ctx.run(researchHackathon,payload);
   const withGaps=await ctx.run(identifyGaps,researched);
   const followed=await ctx.run(followupResearch,withGaps);

@@ -95,7 +95,7 @@ PIVOT sends the idea, constraints, hackathon context, both evidence rounds, gaps
 6. Create a Render API key, set it as `RENDER_API_KEY`, and set the task slug as `RENDER_WORKFLOW_ID` in the web app.
 7. Trigger once and inspect the chained tasks and retry boundaries in Render’s Runs view.
 
-The web adapter calls the official `POST https://api.render.com/v1/task-runs` endpoint. The task graph uses three retries with exponential backoff; the application sends its idempotency key into the workflow payload. See [workflow setup](https://render.com/docs/workflows-tutorial), [task definitions and retries](https://render.com/docs/workflows-defining), and [triggering runs](https://render.com/docs/workflows-running).
+In live mode, `/api/analyze` calls the official `POST https://api.render.com/v1/task-runs` endpoint with the positional input array `[analysisInput, idempotencyKey]`, polls `GET /v1/task-runs/{runId}` to a terminal state, and returns the workflow's report result. It never falls back to the local runner after a Render failure. The task graph uses three retries with exponential backoff, and the idempotency key also derives a stable analysis ID. See [workflow setup](https://render.com/docs/workflows-tutorial), [task definitions and retries](https://render.com/docs/workflows-defining), and [triggering runs](https://render.com/docs/workflows-running).
 
 ## Persistence
 

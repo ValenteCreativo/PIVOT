@@ -8,6 +8,10 @@ import { DemoResearchProvider } from '@/providers/research/demo';
 import { IdempotencyCache, withRetry } from '@/workflows/retry';
 import { CHILD_TASK_RETRY, ORCHESTRATOR_RETRY } from '@/workflows/retry-policy';
 import { NebiusInferenceProvider } from '@/providers/inference/nebius';
+import { runConfiguredAnalysis } from '@/workflows';
+import { runRenderWorkflow } from '@/workflows/render';
+import { workflowOrdinal } from '@/lib/workflow-progress';
+import { analysisIdFor } from '@/lib/idempotency';
 
 function assessment(overrides:Partial<MentorModelAssessment>={}):MentorModelAssessment {
   return {
@@ -25,6 +29,8 @@ function assessment(overrides:Partial<MentorModelAssessment>={}):MentorModelAsse
 }
 
 const emptyResearch:ResearchRound[]=[{round:1,focus:'hackathon',queries:['tracks'],findings:[],gaps:['Sponsor details unavailable']}];
+const focusInput={idea:'A multiplayer focus room where remote teams race to finish one task together.'};
+const mentorReport=()=>buildLiveMentorReport(focusInput,emptyResearch,assessment());
 
 afterEach(()=>vi.restoreAllMocks());
 
@@ -93,4 +99,32 @@ describe('workflow resilience',()=>{
   it('retries a transient failure',async()=>{let calls=0;const result=await withRetry(async()=>{calls++;if(calls===1)throw new Error('503');return'ok'});expect(result).toEqual({value:'ok',attempts:2,recovered:true})});
   it('keeps idempotent results singular',()=>{const cache=new IdempotencyCache<number>();cache.set('run',1);cache.set('run',1);expect(cache.get('run')).toBe(1);expect(cache.size()).toBe(1)});
   it('retries child tasks without retrying the parent orchestration chain',()=>{expect(CHILD_TASK_RETRY.maxRetries).toBe(3);expect(ORCHESTRATOR_RETRY.maxRetries).toBe(0)});
+});
+
+describe('workflow routing',()=>{
+  it('uses the local runner only in demo mode',async()=>{
+    const report=mentorReport();const localRunner=vi.fn().mockResolvedValue(report);const renderRunner=vi.fn();
+    const result=await runConfiguredAnalysis(focusInput,'demo-key',{APP_MODE:'demo'},{localRunner,renderRunner});
+    expect(localRunner).toHaveBeenCalledWith(focusInput,'demo-key');expect(renderRunner).not.toHaveBeenCalled();expect(result.execution.kind).toBe('demo-local');
+  });
+  it('uses Render in live mode and never calls the local runner',async()=>{
+    const report=mentorReport();const localRunner=vi.fn();const renderRunner=vi.fn().mockResolvedValue({report,workflowRunId:'trn-live',status:'succeeded',taskSlug:'pivot-analysis/run_analysis'});
+    const result=await runConfiguredAnalysis(focusInput,'live-key',{APP_MODE:'live',RENDER_API_KEY:'secret',RENDER_WORKFLOW_ID:'pivot-analysis/run_analysis'},{localRunner,renderRunner});
+    expect(renderRunner).toHaveBeenCalledWith(focusInput,'live-key',expect.objectContaining({APP_MODE:'live'}));expect(localRunner).not.toHaveBeenCalled();expect(result.execution).toMatchObject({kind:'render',workflowRunId:'trn-live',status:'succeeded'});
+  });
+  it('surfaces a Render failure without replacing it with local execution',async()=>{
+    const localRunner=vi.fn();const renderRunner=vi.fn().mockRejectedValue(new Error('Render is unavailable'));
+    await expect(runConfiguredAnalysis(focusInput,'failed-key',{APP_MODE:'live'},{localRunner,renderRunner})).rejects.toThrow('Render is unavailable');expect(localRunner).not.toHaveBeenCalled();
+  });
+  it('sends exactly two positional arguments and returns the polled Render result',async()=>{
+    const report=mentorReport();
+    const fetchImpl=vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({id:'trn-123',status:'pending'}),{status:202})).mockResolvedValueOnce(new Response(JSON.stringify({id:'trn-123',status:'succeeded',results:[{report,status:'complete'}]}),{status:200}));
+    vi.spyOn(console,'info').mockImplementation(()=>undefined);
+    const result=await runRenderWorkflow(focusInput,'positional-key',{RENDER_API_KEY:'never-log-me',RENDER_WORKFLOW_ID:'pivot-analysis/run_analysis'},{fetchImpl,wait:async()=>undefined,pollIntervalMs:0,timeoutMs:1000});
+    const startBody=JSON.parse(String(fetchImpl.mock.calls[0][1]?.body));
+    expect(startBody).toEqual({task:'pivot-analysis/run_analysis',input:[focusInput,'positional-key']});expect(fetchImpl.mock.calls[1][0]).toBe('https://api.render.com/v1/task-runs/trn-123');expect(result.report.analysisId).toBe(report.analysisId);expect(result.workflowRunId).toBe('trn-123');
+  });
+  it('keeps workflow numbering within its total and derives stable report IDs',async()=>{
+    expect(workflowOrdinal(0,9)).toBe(1);expect(workflowOrdinal(9,9)).toBe(9);expect(workflowOrdinal(10,9)).toBe(9);expect(await analysisIdFor('same-key')).toBe(await analysisIdFor('same-key'));
+  });
 });
