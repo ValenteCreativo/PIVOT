@@ -6,9 +6,9 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "vinext dev",
-    "build": "vinext build",
-    "start": "vinext start",
+    "dev": "PIVOT_BUILD_TARGET=sites vinext dev",
+    "build": "PIVOT_BUILD_TARGET=sites vinext build",
+    "start": "PIVOT_BUILD_TARGET=sites vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "test": "vitest run",
     "workflow:start": "tsx render-workflow/tasks.ts",
