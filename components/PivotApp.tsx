@@ -262,7 +262,7 @@ export default function PivotApp({
           setView("report");
           window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
         },
-        reduced ? 180 : 4200,
+        reduced ? 180 : 6800,
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Analysis failed");
