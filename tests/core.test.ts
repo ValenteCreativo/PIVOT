@@ -5,6 +5,7 @@ import { analysisInputSchema, CANONICAL_DIMENSION_KEYS, mentorInferenceJsonSchem
 import type { MentorReport, ResearchRound } from '@/lib/types';
 import { detectMode } from '@/providers/mode';
 import { DemoResearchProvider } from '@/providers/research/demo';
+import { LinkupResearchProvider } from '@/providers/research/linkup';
 import { IdempotencyCache, withRetry } from '@/workflows/retry';
 import { CHILD_TASK_RETRY, INFERENCE_TASK_RETRY, ORCHESTRATOR_RETRY } from '@/workflows/retry-policy';
 import { NebiusInferenceProvider } from '@/providers/inference/nebius';
@@ -106,6 +107,18 @@ describe('providers and schemas',()=>{
     await expect(new NebiusInferenceProvider('never-log-this-key','model-from-env').evaluate({idea:'A sufficiently detailed test idea'},[])).rejects.toThrow('Unknown mentor dimension label');const logged=JSON.stringify(errorLog.mock.calls);expect(logged).toContain('Unrecognized dimension');expect(logged).not.toContain('never-log-this-key');
   });
   it('derives follow-up queries from Round 1 gaps',async()=>{const p=new DemoResearchProvider();const input={idea:'AI climate app'};const one=await p.researchHackathon(input);const gaps=await p.identifyEvidenceGaps(one,input);const two=await p.followUpSearch(gaps,input);expect(two.queries[0]).toContain(gaps[0]);expect(two.round).toBe(2)});
+  it('separates target-event retrieval from idea-landscape retrieval and marks first-party evidence',async()=>{
+    const fetchMock=vi.spyOn(globalThis,'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'Official rules',url:'https://burning-token.example/rules',content:'Tracks, sponsors, judging criteria, prizes and deadline.'}]}),{status:200,headers:{'Content-Type':'application/json'}}))
+      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'Focus-room alternatives',url:'https://products.example/focus',content:'Competitor and adoption evidence for multiplayer focus rooms.'}]}),{status:200,headers:{'Content-Type':'application/json'}}));
+    const provider=new LinkupResearchProvider('secret');const input={hackathonUrl:'https://burning-token.example/',idea:'A multiplayer focus room for remote product teams'};const round=await provider.researchHackathon(input);
+    const queries=fetchMock.mock.calls.map(call=>JSON.parse(String(call[1]?.body)).q as string);
+    expect(queries).toHaveLength(2);expect(queries[0]).toContain('site:burning-token.example');expect(queries[0]).not.toContain(input.idea);expect(queries[1]).toContain(input.idea);expect(queries[1]).not.toContain(input.hackathonUrl);
+    expect(round.findings[0]).toMatchObject({confidence:92,relationship:'Target event · first-party'});expect(round.findings[1].relationship).toBe('Idea landscape');
+    const gaps=await provider.identifyEvidenceGaps(round,input);expect(gaps.some(gap=>gap.includes('Verify the supplied hackathon'))).toBe(false);
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({results:[]}),{status:200,headers:{'Content-Type':'application/json'}}));const followUp=await provider.followUpSearch(gaps,input);
+    expect(followUp.queries[0]).toContain(gaps[0]);expect(JSON.parse(String(fetchMock.mock.calls[2][1]?.body)).q).toContain(gaps[0]);
+  });
 });
 
 describe('workflow resilience',()=>{
