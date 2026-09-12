@@ -525,7 +525,7 @@ export default function PivotApp({
       <main className="site-shell landing-page">
         <Header sound={sound} setSound={setSound} mode={report.mode} />
         <section className="landing-wrap">
-          <p className="landing-kicker">MACHINE STOPPED · ANALYSIS LOCKED</p>
+          <p className="landing-kicker">THE MACHINE HAS STOPPED · THE ODDS ARE IN</p>
           <div className="landing-machine">
             <div className="landing-reels" aria-label="Final scores">
               <div>
@@ -586,8 +586,8 @@ export default function PivotApp({
         <section className="process-wrap">
           <div className="process-kicker">
             {initialMode === "live"
-              ? "REMOTE ANALYSIS IN FLIGHT"
-              : `DEMO WORKFLOW / ${workflowOrdinal(completed, steps.length)} OF ${steps.length}`}
+              ? "RUNNING THE ODDS · LIVE"
+              : `RUNNING THE ODDS · STEP ${workflowOrdinal(completed, steps.length)} OF ${steps.length}`}
           </div>
           <h1>
             THE MACHINE IS
@@ -664,10 +664,10 @@ export default function PivotApp({
           </div>
           <p className="process-note">
             {steps[active]?.state === "failed"
-              ? "EVALUATION INTERRUPTED."
+              ? "THE MACHINE HIT A SNAG."
               : initialMode === "live"
-                ? "REAL REMOTE EXECUTION · STATUS DISCLOSURE"
-                : "DEMO EXECUTION · CURATED FIXTURES"}{" "}
+                ? "LIVE RUN · HONEST STATUS"
+                : "DEMO RUN · CURATED EVIDENCE"}{" "}
             <span>
               {steps[active]?.state === "retrying"
                 ? "Retrying safely. Previous research preserved."
@@ -1334,26 +1334,52 @@ RUN ANOTHER IDEA
 
         <div className="poster-rail" aria-label="Demo ideas">
           <span className="rail-lead">OR TRY A DEMO IDEA</span>
-          <div className="hand-grid">
-            {examples.map((x, i) => (
-              <button
-                key={x.label}
-                onClick={() => {
-                  setForm({ ...form, idea: x.idea });
-                  intakeRef.current?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                <span>0{i + 1}</span>
-                <b>
-                  {x.label.split("\n").map((line, li) => (
-                    <span className="ticket-line" key={li}>
-                      {line}
-                    </span>
-                  ))}
-                </b>
-                <small>{x.tag}</small>
-              </button>
-            ))}
+          <div className="rail-marquee">
+            <ul className="rail-track">
+              {examples.map((x, i) => (
+                <li key={x.label}>
+                  <button
+                    className="demo-ticket"
+                    onClick={() => {
+                      setForm({ ...form, idea: x.idea });
+                      intakeRef.current?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    <span className="ticket-no">0{i + 1}</span>
+                    <b>
+                      {x.label.split("\n").map((line, li) => (
+                        <span className="ticket-line" key={li}>
+                          {line}
+                        </span>
+                      ))}
+                    </b>
+                    <small>{x.tag}</small>
+                  </button>
+                </li>
+              ))}
+              {examples.map((x, i) => (
+                <li key={`dup-${x.label}`} aria-hidden="true">
+                  <button
+                    className="demo-ticket"
+                    tabIndex={-1}
+                    onClick={() => {
+                      setForm({ ...form, idea: x.idea });
+                      intakeRef.current?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    <span className="ticket-no">0{i + 1}</span>
+                    <b>
+                      {x.label.split("\n").map((line, li) => (
+                        <span className="ticket-line" key={li}>
+                          {line}
+                        </span>
+                      ))}
+                    </b>
+                    <small>{x.tag}</small>
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -1519,25 +1545,19 @@ function StatusBank({
     <div className="status-bank">
       <div className="bank-lines">
         <span>
-          <i className={mode === "running" ? "warm" : ""} /> RESEARCH{" "}
-          <b>{mode === "running" ? "ACTIVE" : "WAITING"}</b>
+          <i className={mode === "running" ? "warm" : ""} /> RESEARCHING{" "}
+          <b>{mode === "running" ? "ON" : "—"}</b>
         </span>
         <span>
-          <i className={mode === "running" ? "warm" : ""} /> MENTOR{" "}
-          <b>{mode === "running" ? "ACTIVE" : "WAITING"}</b>
+          <i className={mode === "running" ? "warm" : ""} /> EVALUATING{" "}
+          <b>{mode === "running" ? "ON" : "—"}</b>
         </span>
         <span>
           <i
             className={mode === "ready" || mode === "running" ? "active" : ""}
           />{" "}
-          WORKFLOW{" "}
-          <b>
-            {mode === "running"
-              ? "ACTIVE"
-              : mode === "ready"
-                ? "READY"
-                : "WAITING"}
-          </b>
+          ORCHESTRATING{" "}
+          <b>{mode === "running" ? "ON" : mode === "ready" ? "READY" : "—"}</b>
         </span>
       </div>
       <div className="elapsed-readout">

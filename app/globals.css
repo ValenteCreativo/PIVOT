@@ -27,7 +27,7 @@
 
   --ink-shadow: 6px 7px 0 var(--ink);
   --ink-shadow-sm: 4px 4px 0 var(--ink);
-  --radius-machine: 46px;
+  --radius-machine: 38px;
 
   --font-serif: var(--font-display), Georgia, 'Times New Roman', serif;
   --font-cond: var(--font-machine), 'Arial Narrow', sans-serif;
@@ -168,38 +168,40 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   position: relative;
   max-width: 1440px;
   margin: 0 auto;
-  padding: clamp(14px, 2.4vh, 30px) clamp(20px, 4vw, 58px) clamp(20px, 3vh, 40px);
+  padding: clamp(12px, 1.8vh, 24px) clamp(20px, 4vw, 58px) clamp(16px, 2.4vh, 32px);
 }
 
 .poster-headline { text-align: center; position: relative; }
-.headline-star { display: block; color: var(--oxblood); font-size: 13px; margin-bottom: 2px; }
+.headline-star { display: block; color: var(--oxblood); font-size: 12px; margin-bottom: 1px; }
 .poster-headline h1 {
   margin: 0;
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(44px, 6.4vw, 96px);
-  line-height: 0.88;
+  font-size: clamp(42px, 5.4vw, 80px);
+  line-height: 0.86;
   letter-spacing: -0.035em;
   color: var(--ink);
   text-transform: uppercase;
+  text-wrap: balance;
 }
 .poster-headline h1 em { color: var(--oxblood); font-style: normal; }
 .headline-sub {
-  margin: 10px auto 0;
-  max-width: 620px;
+  margin: 9px auto 0;
+  max-width: 560px;
   font-family: var(--font-cond);
   font-weight: 600;
-  font-size: clamp(13px, 1.2vw, 16px);
+  font-size: clamp(13px, 1.15vw, 15px);
   letter-spacing: 0.02em;
   color: var(--ink-soft);
+  text-wrap: balance;
 }
 
 .poster-grid {
   display: grid;
-  grid-template-columns: minmax(180px, 0.9fr) minmax(520px, 2fr) minmax(180px, 0.9fr);
-  gap: clamp(20px, 2.6vw, 46px);
+  grid-template-columns: minmax(170px, 0.85fr) minmax(500px, 1.9fr) minmax(170px, 0.85fr);
+  gap: clamp(18px, 2.2vw, 40px);
   align-items: center;
-  margin-top: clamp(12px, 2vh, 26px);
+  margin-top: clamp(10px, 1.6vh, 22px);
 }
 
 /* --- Left editorial column --- */
@@ -292,8 +294,11 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .machine-stage {
   position: relative;
   isolation: isolate;
-  padding: 4px 82px 8px 4px;
-  filter: drop-shadow(14px 16px 0 #251d1418);
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 4px 72px 8px 4px;
+  filter: drop-shadow(12px 14px 0 #251d1418);
 }
 
 .intake-machine,
@@ -326,7 +331,7 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   background: linear-gradient(#9d8a70, #6f5e46);
 }
 .machine-stage::before { left: 9%; }
-.machine-stage::after { right: calc(82px + 9%); }
+.machine-stage::after { right: calc(72px + 9%); }
 
 /* marquee / painted sign */
 .machine-cap {
@@ -336,19 +341,19 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-height: 62px;
-  padding: 8px 26px;
+  min-height: 50px;
+  padding: 6px 24px;
   border-bottom: 3px solid var(--ink);
-  border-radius: 38px 38px 0 0;
+  border-radius: 31px 31px 0 0;
   background:
     repeating-linear-gradient(90deg, #8f2425, #8f2425 3px, #892222 3px, #892222 6px);
   color: var(--cream);
   text-shadow: 0 1px 0 #00000060;
 }
-.machine-cap .cap-title { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.machine-cap .cap-title { display: flex; flex-direction: column; align-items: center; gap: 1px; }
 .machine-cap b {
   font-family: var(--font-serif);
-  font-size: clamp(26px, 3vw, 42px);
+  font-size: clamp(24px, 2.6vw, 34px);
   line-height: 0.86;
   letter-spacing: 0.01em;
   color: var(--cream);
@@ -356,11 +361,11 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .machine-cap .cap-sub {
   font-family: var(--font-cond);
   font-weight: 700;
-  font-size: clamp(10px, 1.05vw, 13px);
+  font-size: clamp(9px, 0.95vw, 11px);
   letter-spacing: 0.22em;
   color: #f2d99a;
 }
-.machine-cap .cap-star { color: var(--gold); font-size: 14px; align-self: center; }
+.machine-cap .cap-star { color: var(--gold); font-size: 13px; align-self: center; }
 
 .machine-screws { position: absolute; z-index: 3; inset: 13px; pointer-events: none; }
 .machine-screws i {
@@ -383,8 +388,8 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(10px, 1.4vw, 18px);
-  padding: clamp(14px, 2vw, 22px) clamp(18px, 2.4vw, 30px) clamp(8px, 1.2vw, 14px);
+  gap: clamp(9px, 1.2vw, 15px);
+  padding: clamp(11px, 1.5vw, 16px) clamp(15px, 2vw, 24px) clamp(11px, 1.5vw, 16px);
   border-bottom: 3px solid var(--ink);
   background: var(--green);
   background-image: radial-gradient(#ffffff10 0.6px, transparent 0.7px);
@@ -395,7 +400,7 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   position: relative;
   display: grid;
   place-items: center;
-  height: clamp(78px, 8vw, 118px);
+  height: clamp(70px, 6.4vw, 92px);
   overflow: hidden;
   border: 5px solid var(--ink);
   border-radius: 8px;
@@ -408,8 +413,8 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 }
 .reel-window::before { top: 20%; }
 .reel-window::after { bottom: 20%; }
-.reel-face { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.reel-glyph { width: clamp(34px, 4vw, 50px); height: clamp(34px, 4vw, 50px); }
+.reel-face { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.reel-glyph { width: clamp(30px, 3.4vw, 42px); height: clamp(30px, 3.4vw, 42px); }
 .reel-name {
   font-family: var(--font-cond); font-weight: 700; font-size: clamp(10px, 1.05vw, 13px);
   letter-spacing: 0.1em; color: var(--ink);
@@ -447,7 +452,7 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   position: relative;
   z-index: 1;
   margin: 0;
-  padding: 7px 10px;
+  padding: 5px 10px;
   text-align: center;
   border-bottom: 3px solid var(--ink);
   background: #cdbc9f;
@@ -462,7 +467,7 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .machine-deck {
   position: relative;
   z-index: 1;
-  padding: clamp(12px, 1.6vw, 18px) clamp(18px, 2.2vw, 26px) clamp(14px, 1.8vw, 20px);
+  padding: clamp(10px, 1.3vw, 14px) clamp(16px, 2vw, 24px) clamp(12px, 1.5vw, 16px);
   border-radius: 0 0 6px 6px;
   background: linear-gradient(#e7dbc6, #d7c8b1);
 }
@@ -470,7 +475,7 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 0 6px;
+  margin: 0 0 5px;
   font-family: var(--font-cond);
   font-weight: 700;
   font-size: 11px;
@@ -496,7 +501,7 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   outline: 0;
   resize: none;
 }
-.intake-machine textarea { min-height: 54px; line-height: 1.4; }
+.intake-machine textarea { min-height: 46px; line-height: 1.4; }
 .intake-machine ::placeholder { color: #8f8578; }
 .intake-machine input:focus,
 .intake-machine textarea:focus,
@@ -505,8 +510,8 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .deck-controls {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 9px;
+  margin-top: 8px;
 }
 .deck-controls label,
 .constraint-grid label {
@@ -520,7 +525,7 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .deck-controls input { margin-top: 4px; }
 .deck-num input { width: 64px; text-align: center; }
 
-.more-constraints { margin-top: 10px; }
+.more-constraints { margin-top: 8px; }
 .more-constraints summary {
   cursor: pointer;
   list-style: none;
@@ -563,8 +568,8 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 52px;
-  margin-top: 12px;
+  min-height: 48px;
+  margin-top: 10px;
   padding: 0 20px;
   border: 2px solid var(--ink);
   background: var(--oxblood);
@@ -584,7 +589,7 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 
 .ticket-slot {
   display: flex; align-items: center; justify-content: center;
-  height: 16px; margin: 11px 18% 0;
+  height: 14px; margin: 9px 18% 0;
   border: 2px solid var(--ink); border-bottom-width: 5px; border-radius: 2px;
   background: #4c433a; color: #efe2cf;
   font-family: var(--font-cond); font-weight: 700; font-size: 7px; letter-spacing: 0.18em;
@@ -604,26 +609,26 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .lever-label {
   position: absolute;
   z-index: 5;
-  right: -4px;
-  top: 66px;
-  width: 74px;
+  right: -2px;
+  top: 52px;
+  width: 68px;
   text-align: center;
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.15;
   color: var(--ink);
 }
-.lever-arrow { display: block; width: 34px; height: 28px; margin: 4px auto 0; }
+.lever-arrow { display: block; width: 30px; height: 26px; margin: 3px auto 0; }
 .machine-lever {
   --lever-pull: 0;
   touch-action: none;
   position: absolute;
   z-index: 4;
-  right: -30px;
-  top: 118px;
-  width: 120px;
-  height: 250px;
+  right: -26px;
+  top: 100px;
+  width: 108px;
+  height: 230px;
   border: 0;
   background: transparent;
   cursor: grab;
@@ -663,14 +668,13 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .machine-lever.snapping .lever-arm,
 .machine-lever.snapping .lever-handle { transition: transform 0.12s cubic-bezier(0.2, 1.6, 0.4, 1); }
 
-/* --- demo ticket rail --- */
+/* --- demo ticket rail: slow auto-scrolling marquee of vintage test cards --- */
 .poster-rail {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: clamp(14px, 2vh, 26px);
+  gap: 18px;
+  margin-top: clamp(12px, 1.8vh, 22px);
 }
 .rail-lead {
   font-family: var(--font-cond);
@@ -678,37 +682,61 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   font-size: 11px;
   letter-spacing: 0.14em;
   color: var(--green);
+  white-space: nowrap;
 }
-.poster-rail .hand-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-.poster-rail .hand-grid button {
+.rail-marquee {
   position: relative;
-  min-width: 128px;
-  min-height: 52px;
-  padding: 8px 14px 8px 30px;
+  overflow: hidden;
+  /* soft printed edge fade */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+.rail-track {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  margin: 0;
+  padding: 4px 0 8px;
+  list-style: none;
+  /* calm, premium drift ~6-8px/sec across ~950px of unique content */
+  animation: rail-scroll 120s linear infinite;
+}
+.rail-track > li { flex: 0 0 auto; }
+.rail-marquee:hover .rail-track,
+.rail-marquee:focus-within .rail-track { animation-play-state: paused; }
+
+.demo-ticket {
+  position: relative;
+  display: block;
+  min-width: 150px;
+  min-height: 50px;
+  padding: 7px 14px 7px 28px;
   border: 2px solid var(--ink);
-  border-radius: 4px;
+  border-radius: 3px;
   background: #fbf4e8;
   color: var(--ink);
   text-align: left;
   box-shadow: 3px 3px 0 var(--ink);
-  transition: transform 0.15s, background 0.15s;
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
 }
-.poster-rail .hand-grid button::before {
+/* perforated ticket stub */
+.demo-ticket::before {
   content: '';
-  position: absolute; left: 8px; top: 8px; bottom: 8px; width: 4px;
+  position: absolute; left: 8px; top: 7px; bottom: 7px; width: 3px;
   background: repeating-linear-gradient(#8f2425 0 3px, transparent 3px 6px);
 }
-.poster-rail .hand-grid button span {
+.demo-ticket .ticket-no {
   font-family: var(--font-mono); font-size: 8px; color: var(--ink-faint); letter-spacing: 0.1em;
 }
-.poster-rail .hand-grid button b {
-  display: block; margin-top: 2px; font-family: var(--font-cond); font-weight: 700; font-size: 13px; line-height: 1.05;
+.demo-ticket b {
+  display: block; margin-top: 1px; font-family: var(--font-cond); font-weight: 700; font-size: 13px; line-height: 1.05;
 }
-.poster-rail .hand-grid button b .ticket-line { display: block; font: inherit; color: inherit; letter-spacing: 0; }
-.poster-rail .hand-grid button small {
+.demo-ticket b .ticket-line { display: block; font: inherit; color: inherit; letter-spacing: 0; }
+.demo-ticket small {
   font-family: var(--font-cond); font-weight: 700; font-size: 8px; letter-spacing: 0.1em; color: var(--oxblood);
 }
-.poster-rail .hand-grid button:hover { transform: translateY(-3px); background: var(--gold); }
+.demo-ticket:hover { transform: translateY(-3px); background: var(--gold); }
+.demo-ticket:active { transform: translateY(1px); box-shadow: 1px 1px 0 var(--ink); }
 
 /* --- rose flash motif --- */
 .poster-flash {
@@ -748,10 +776,12 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .method, .benchmark {
   max-width: 1440px;
   margin: 0 auto;
-  padding: clamp(60px, 8vw, 100px) clamp(20px, 4vw, 58px);
+  padding: clamp(56px, 7vw, 96px) clamp(20px, 4vw, 58px);
   border-top: 2px solid var(--ink);
 }
-.method { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: clamp(40px, 5vw, 70px); align-items: center; }
+/* each major section reads as a deliberate editorial chapter */
+.method { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: clamp(40px, 5vw, 70px); align-items: center; min-height: 78svh; align-content: center; }
+.benchmark { min-height: 84svh; display: flex; flex-direction: column; justify-content: center; }
 .method h2, .benchmark h2, .infrastructure h2 {
   margin: 0;
   font-family: var(--font-serif);
@@ -818,9 +848,10 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 
 .infrastructure {
   max-width: 1440px; margin: 0 auto;
-  padding: clamp(60px, 8vw, 100px) clamp(20px, 4vw, 58px);
+  padding: clamp(56px, 7vw, 96px) clamp(20px, 4vw, 58px);
   border-top: 2px solid var(--ink);
   display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(40px, 5vw, 60px);
+  min-height: 72svh; align-content: center;
 }
 .infrastructure-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid var(--ink); background: var(--paper-panel); box-shadow: var(--ink-shadow); }
 .infrastructure-grid article { padding: 24px; border-right: 1px solid var(--ink); }
@@ -1110,20 +1141,48 @@ footer > span { font-family: var(--font-cond); font-weight: 700; font-size: 9px;
 @keyframes print-receipt { 0% { max-height: 0; opacity: 0; transform: translateY(-30px); overflow: hidden; } 100% { max-height: 800px; opacity: 1; transform: none; overflow: visible; } }
 @keyframes lamp-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 @keyframes progress-scan { 0% { transform: translateX(-120%); } 100% { transform: translateX(520%); } }
+@keyframes rail-scroll { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
 
 /* =========================================================================
    RESPONSIVE
    ========================================================================= */
 
-/* laptop heights: tighten the poster to keep everything in one viewport */
-@media (min-width: 1081px) and (max-height: 860px) {
+/* laptop heights: tighten the poster so the whole hero fits one viewport.
+   1440x900 lands here; 1366x768 hits the tighter tier below. */
+@media (min-width: 1081px) and (max-height: 940px) {
   .topbar { min-height: 52px; }
-  .hero.poster { padding-top: 12px; padding-bottom: 20px; }
-  .poster-headline h1 { font-size: clamp(44px, 5.6vw, 80px); }
-  .poster-grid { margin-top: 12px; gap: clamp(16px, 2vw, 34px); }
-  .reel-window { height: clamp(72px, 6.5vw, 96px); }
-  .machine-deck { padding-top: 12px; padding-bottom: 14px; }
-  .poster-rail { margin-top: 14px; }
+  .hero.poster { padding-top: 12px; padding-bottom: 18px; }
+  .poster-headline h1 { font-size: clamp(44px, 5vw, 72px); }
+  .headline-sub { margin-top: 7px; }
+  .poster-grid { margin-top: 10px; gap: clamp(14px, 1.8vw, 32px); }
+  .machine-cap { min-height: 46px; }
+  .machine-reels { padding-top: 10px; padding-bottom: 10px; }
+  .reel-window { height: clamp(66px, 5.6vw, 82px); }
+  .machine-motto { padding-top: 4px; padding-bottom: 4px; }
+  .machine-deck { padding-top: 9px; padding-bottom: 12px; }
+  .intake-machine textarea { min-height: 42px; }
+  .run-button { min-height: 46px; margin-top: 9px; }
+  .poster-rail { margin-top: 12px; }
+}
+
+@media (min-width: 1081px) and (max-height: 800px) {
+  .topbar { min-height: 48px; }
+  .hero.poster { padding-top: 9px; padding-bottom: 14px; }
+  .poster-headline h1 { font-size: clamp(40px, 4.6vw, 64px); }
+  .headline-star { display: none; }
+  .headline-sub { margin-top: 6px; font-size: 13px; }
+  .poster-grid { margin-top: 8px; }
+  .machine-stage { max-width: 600px; }
+  .machine-cap { min-height: 42px; }
+  .machine-cap b { font-size: clamp(22px, 2.3vw, 30px); }
+  .reel-window { height: clamp(60px, 5vw, 74px); }
+  .reel-glyph { width: clamp(28px, 3vw, 38px); height: clamp(28px, 3vw, 38px); }
+  .machine-deck { padding-top: 8px; padding-bottom: 10px; }
+  .intake-machine textarea { min-height: 38px; }
+  .deck-controls { margin-top: 7px; }
+  .run-button { min-height: 44px; margin-top: 8px; }
+  .ticket-slot { margin-top: 7px; }
+  .poster-rail { margin-top: 10px; }
 }
 
 @media (max-width: 1080px) {
@@ -1200,10 +1259,13 @@ footer > span { font-family: var(--font-cond); font-weight: 700; font-size: 9px;
   .lever-arm { right: 56px; bottom: 26px; width: 96px; height: 12px; transform-origin: 100% 50%; transform: rotate(calc(var(--lever-pull) * 28deg)); }
   .lever-handle { right: 128px; bottom: 8px; width: 46px; height: 46px; transform-origin: 106px 50%; transform: rotate(calc(var(--lever-pull) * 28deg)); }
 
-  .poster-rail { flex-direction: column; align-items: stretch; }
-  .poster-rail .hand-grid { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x proximity; justify-content: flex-start; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
-  .poster-rail .hand-grid::-webkit-scrollbar { display: none; }
-  .poster-rail .hand-grid button { flex: 0 0 auto; scroll-snap-align: start; }
+  /* mobile: native touch scroll, no auto-scroll; hide the duplicate loop set */
+  .poster-rail { grid-template-columns: 1fr; gap: 10px; }
+  .rail-marquee { overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; -webkit-mask-image: none; mask-image: none; }
+  .rail-marquee::-webkit-scrollbar { display: none; }
+  .rail-track { animation: none; padding-bottom: 6px; }
+  .rail-track > li[aria-hidden="true"] { display: none; }
+  .demo-ticket { scroll-snap-align: start; }
 
   .method, .benchmark, .infrastructure { padding: 56px 16px; }
   .metric-grid { grid-template-columns: 1fr 1fr; }
@@ -1239,5 +1301,9 @@ footer > span { font-family: var(--font-cond); font-weight: 700; font-size: 9px;
   .progress-line.indeterminate i { width: 50%; transform: none; }
   .lever-arm, .lever-handle { transition: none !important; }
   .mentor-receipt { animation: none; }
-  .run-button, .try-demo, .open-report, .poster-rail .hand-grid button { transition: none; }
+  .run-button, .try-demo, .open-report, .demo-ticket { transition: none; }
+  /* rail: stop the marquee, allow manual horizontal scroll instead */
+  .rail-track { animation: none !important; }
+  .rail-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .rail-track > li[aria-hidden="true"] { display: none; }
 }
