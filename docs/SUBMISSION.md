@@ -6,7 +6,21 @@ An evidence-driven AI hackathon mentor that tells teams when to fold, pivot, dou
 
 ## Short description
 
-PIVOT! wraps serious hackathon mentorship in a premium casino decision terminal. It researches the event and competitive landscape in two rounds, finds missing evidence, scores both hackathon and real-world potential, then rewrites a rough idea into a focused MVP, 24-hour plan, and 60-second demo.
+Hackathon teams lose their weekend to ideas that sound exciting but are vague, weakly differentiated, or impossible to demo. PIVOT! researches the event and idea in two evidence rounds before Nebius evaluates ten mentor dimensions and deterministic code returns a verdict, scoped build, and demo plan through an idempotent Render Workflow.
+
+## Sponsor implementation
+
+### Linkup
+
+Linkup runs in the main analysis path, not as decoration. PIVOT searches the supplied event domain separately from the project landscape, stores Round 1 sources, identifies material unknowns, and generates Round 2 searches directly from those gaps; missing first-party evidence remains UNKNOWN.
+
+### Nebius Token Factory
+
+GLM-5.3-Flash produces a strict structured assessment across ten mentor dimensions. Zod enforces the domain contract, and application code independently calculates the score, Hackathon Edge, Real-World Edge, verdict tier, and near-miss distance.
+
+### Render Workflows
+
+Render executes the production analysis as seven chained child tasks and returns the terminal report to Vercel. Retries occur at the smallest useful boundary, deterministic schema failures fail fast, and the propagated idempotency key prevents duplicate reports or findings.
 
 ## Long description
 
@@ -31,7 +45,7 @@ A demanding but constructive mentor that researches before judging, exposes unce
 3. Save Round 1 and identify missing signals.
 4. Generate follow-up questions and run Round 2.
 5. Evaluate ten weighted dimensions with structured inference.
-6. Temper the verdict by confidence and evidence coverage.
+6. Calculate the score, edge scores, verdict, and near miss deterministically from canonical dimension scores.
 7. Persist and present the stronger pivot, scope, plan, and demo.
 
 ## Sponsor technologies
@@ -57,9 +71,14 @@ The most useful mentor output is not a score. It is the causal chain from eviden
 
 Run and publish the live model benchmark, add signed share links, tune category-specific rubric weights with more mentors, and add exportable review packets without adding account complexity.
 
-## Track eligibility summary
+## Challenge requirement map
 
-The implementation is complete in Demo Mode. Live adapters and Render task definitions are ready for credentialed verification; no claim is made that sponsor services were executed without keys.
+- **Linkup / Deep Research:** real recursive research, persisted Round 1 findings, gap-derived Round 2 queries, inspectable sources, and explicit uncertainty.
+- **Nebius / Applied AI:** Token Factory in the main decision path, strict structured output, ten-dimension evaluation, deterministic downstream scoring, disclosed failure behavior, and a 15-case directional fixture benchmark.
+- **Render / Workflows:** real multi-step background task graph, child-level retry policy, idempotency, final result polling, visible remote provenance, and no local fallback in Live Mode.
+- **Fun Build:** a tactile “Hackathon Idea Casino” that uses betting language to teach a serious resource-allocation decision without turning mentor output into a joke.
+
+The Vercel → Render → Linkup → Nebius production path has completed successfully. Demo Mode remains an explicitly labeled, zero-key judging fallback.
 
 ## Compact form copy
 

@@ -1,38 +1,64 @@
-# Demo scripts
+# PIVOT! demo scripts
+
+Preferred input: evaluate PIVOT itself against the Burning Token hackathon using the real event URL. If first-party event retrieval is unavailable during judging, use **Multiplayer Focus** in clearly labeled Demo Mode; never present fixtures as live evidence.
+
+## 30 seconds
+
+**0–7s — The problem**
+“A hackathon idea is a bet on your next 36 hours. Most teams get feedback after they build; PIVOT researches before it judges.”
+
+**7–18s — The run**
+Enter PIVOT and the Burning Token URL, then press **Run the Odds**. “Render runs the task chain, Linkup separates event research from the idea landscape, and the gaps it finds determine the second research round.”
+
+**18–30s — The decision**
+Reveal the verdict, score, hard truth, and pivot. “Nebius evaluates ten mentor dimensions; deterministic code lands the verdict and gives us the smallest version worth shipping.”
+
+## 60 seconds
+
+**0–8s — Stakes**
+“A hackathon idea is a bet on your next 24–48 hours. PIVOT checks the odds before you spend them.”
+
+**8–17s — Input**
+Show PIVOT evaluating itself against the real Burning Token event. “This is not idea-to-prompt scoring. The event, idea, and constraints enter a real background workflow.”
+
+**17–30s — Research before judgment**
+Press **Run the Odds**. “Render orchestrates seven child tasks. Linkup first checks the supplied event domain and separately researches competitors, precedent, users, and adoption. PIVOT saves Round 1, identifies what is still unknown, and turns those gaps into Round 2.”
+
+**30–43s — Honest waiting and reliability**
+Point to the remote timer and status disclosure. “The moving marker is explicitly anticipation—we do not fake child-task completion. Transient provider faults retry at the smallest boundary, successful research is preserved, and the idempotency key prevents duplicate reports.”
+
+**43–54s — Evaluation**
+Reveal the report. “Nebius produces a strict ten-dimension assessment. Application code independently calculates Hackathon Edge, Real-World Edge, the total score, verdict, and near miss.”
+
+**54–60s — Action**
+Show the hard truth, pivot, Must Build, and Do Not Build. “The valuable output is not the score. It is knowing what to cut and what to build next.”
 
 ## 90 seconds
 
-**0–10s — Problem**  
-“I’ve mentored roughly ten hackathons, and I keep seeing the same problem: ideas aren’t scarce. Good scoping is.”
+**0–10s — Problem**
+“Hackers rarely lack ideas. They lose weekends to vague users, decorative integrations, impossible scope, and demos that hide the value.”
 
-**10–20s — Intake**  
-Choose **Multiplayer Focus**. “Before this team spends 36 hours building, we give the idea and the event to PIVOT.”
+**10–20s — Thesis**
+“PIVOT is an AI mentor that researches before it judges. The casino metaphor represents a serious bet: your next 36 hours.”
 
-**20–35s — Pull**  
-Click **Run the Odds**. Call out the real workflow states rather than waiting silently.
+**20–32s — Recursive self-demo**
+Enter PIVOT as the target project and the Burning Token event URL. Mention the team constraints, then press **Run the Odds**.
 
-**35–50s — Recursive research**  
-“Round 1 maps tracks and competitors. PIVOT saves what it found, identifies missing behavior and willingness-to-pay evidence, and turns those gaps into Round 2.”
+**32–47s — Sponsor architecture**
+“Render runs the real multi-step workflow. Linkup checks first-party event evidence separately from the project landscape, saves the findings, identifies evidence gaps, and runs targeted follow-up searches. Nebius receives that complete trail and returns a schema-constrained mentor assessment.”
 
-**50–65s — Verdict**  
-Reveal **DOUBLE DOWN / 79** and the near miss. “This is a strong hackathon bet, but the adoption thesis is weaker. Three concrete moves get it over the next threshold.”
+**47–58s — Wait state**
+“A real run takes roughly 30–60 seconds. This timer is real elapsed time; the moving phase marker is labeled anticipation because the browser does not receive child-task events. We show confirmed status only when Render returns it.”
 
-**65–75s — Mentor value**  
-Show the rewritten pivot, five-feature MVP, and “do not build” list. “The mentor’s most valuable move is subtraction.”
+**58–72s — Verdict**
+Reveal the landing. Point to the verdict, score window, hard truth, confidence, evidence coverage, Hackathon Edge, Real-World Edge, and near miss.
 
-**75–85s — Recovery**  
-Deal again with **simulate evaluation failure** enabled. Show failed → retrying → recovered. “The house hit a fault; Render-style retries replay one idempotent step, without duplicate findings or reports.”
+**72–83s — Mentor value**
+Show the ten-dimension odds board, rewritten pivot, Must Build, Do Not Build, and 24–36 hour plan. “PIVOT is a subtraction engine: it turns criticism into a smaller, executable bet.”
 
-**85–90s — Close**  
-“Before you spend 36 hours building it, check the odds.”
+**83–90s — Proof and close**
+Open the research trail and provenance panel. “The sources, unknowns, gap-derived queries, model role, Render run ID, and limitations remain inspectable. Before you spend 36 hours building it, check the odds.”
 
-## Two minutes
+## Recovery fallback
 
-**0–15s:** Give the origin story and distinguish an interesting idea from a buildable hackathon entry.  
-**15–30s:** Load the climate idea and point out that the form accepts useful constraints without becoming an interrogation.  
-**30–50s:** Run analysis; narrate hackathon reading, sponsor mapping, and the two evidence rounds.  
-**50–70s:** Reveal FOLD. Show that it is constructive: the app explains what fails and rewrites the concept around facilities managers and a 15-minute audit.  
-**70–90s:** Load Multiplayer Focus and reveal DOUBLE DOWN / near miss. Compare Hackathon Edge to Real-World Edge.  
-**90–105s:** Turn on Mentor View and show all ten weighted dimensions, source provenance, natural versus forced sponsor fit, and next validation steps.  
-**105–115s:** Trigger the controlled failure and show recovery with attempt counts and the no-duplicate guarantee.  
-**115–120s:** Close with the benchmark’s disclosed misses: “We measure the mentor, not just the model.”
+In Demo Mode only, enable **Judge Mode: Simulate Evaluation Failure**. The interface labels the interruption and recovery as simulated, preserves prior research, and shows the no-duplicate behavior without claiming a live Render retry.
