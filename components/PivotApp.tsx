@@ -60,6 +60,18 @@ const reelLabels = [
   "IMPACT",
   "EVIDENCE",
 ];
+const anticipationLabels = [
+  "READING THE ROOM",
+  "SEARCHING THE LANDSCAPE",
+  "LOOKING FOR THE WEAK LINK",
+  "CHECKING THE EVIDENCE",
+  "PRESSURE-TESTING THE BUILD",
+];
+const benchmarkPreview = [
+  benchmarkCases[1],
+  benchmarkCases[2],
+  benchmarkCases[6],
+];
 const defaultForm: AnalysisInput & { goal: string } = {
   hackathonUrl: "",
   idea: "",
@@ -93,7 +105,8 @@ function Meter({
       <div className="meter-heading">
         <span>{label}</span>
         <b>
-          {value}<small>/{max}</small>
+          {value}
+          <small>/{max}</small>
         </b>
       </div>
       <div className="meter-track">
@@ -341,6 +354,8 @@ export default function PivotApp({
   ).length;
   const anticipated = Math.min(stepLabels.length - 1, Math.floor(elapsed / 4));
   const reelIndex = Math.floor(elapsed / 0.8);
+  const anticipationLabel =
+    anticipationLabels[Math.floor(elapsed / 6) % anticipationLabels.length];
 
   if (view === "landing" && report) {
     const landingReels = ["Novelty", "Hackathon scope", "Evidence"].map((key) =>
@@ -383,7 +398,10 @@ export default function PivotApp({
             >
               <small>THE ODDS SAY</small>
               <strong>{report.verdict}</strong>
-              <b>{report.score}<span>/100</span></b>
+              <b>
+                {report.score}
+                <span>/100</span>
+              </b>
             </div>
           </div>
           <MentorReceipt report={report} />
@@ -418,9 +436,7 @@ export default function PivotApp({
           </h1>
           <div className="process-layout">
             <div className="process-machine">
-              <div className="machine-plate">
-                PIVOT! / ODDS COMPUTER <span>UNIT 001</span>
-              </div>
+              <div className="machine-plate">PIVOT! — IDEA MACHINE</div>
               <MachineReels
                 values={[
                   reelLabels[reelIndex % reelLabels.length],
@@ -432,7 +448,7 @@ export default function PivotApp({
               />
               <StatusBank elapsed={elapsed} mode="running" />
               <p className="researching-signal">
-                <i /> REQUEST ACTIVE · AWAITING VERIFIED RESULT
+                <i /> {anticipationLabel}
               </p>
             </div>
             <div className="workflow" aria-live="polite">
@@ -871,7 +887,7 @@ export default function PivotApp({
       <Header sound={sound} setSound={setSound} mode={initialMode} />
       <section id="top" className="hero">
         <div className="eyebrow">
-          <span>01</span> AI MENTOR FOR HACKATHON IDEAS
+          <span>01</span> HACKATHON IDEA VALIDATOR
         </div>
         <div className="hero-grid">
           <div className="hero-copy">
@@ -916,7 +932,10 @@ export default function PivotApp({
               <div className="machine-deck">
                 <div className="machine-intake-label">
                   <span>INSERT YOUR IDEA</span>
-                  <span className="ready-lamp" aria-label={canRun ? "Ready" : "Waiting for an idea"}>
+                  <span
+                    className="ready-lamp"
+                    aria-label={canRun ? "Ready" : "Waiting for an idea"}
+                  >
                     <i className={canRun ? "active" : ""} />
                   </span>
                 </div>
@@ -1012,7 +1031,9 @@ export default function PivotApp({
                   <span>RUN THE ODDS</span>
                   <span className="arrow">→</span>
                 </button>
-                <div className="ticket-slot" aria-hidden="true"><span>MENTOR REPORT</span></div>
+                <div className="ticket-slot" aria-hidden="true">
+                  <span>MENTOR REPORT</span>
+                </div>
                 {error && <p className="form-error">{error}</p>}
               </div>
             </form>
@@ -1048,12 +1069,11 @@ export default function PivotApp({
           </div>
         </div>
       </section>
-      <section className="demo-hands">
-        <div className="section-kicker">TRY A DEMO IDEA</div>
-        <h2>
-          EVERY IDEA GETS
-          <br />A DIFFERENT HAND.
-        </h2>
+      <section className="demo-hands" aria-label="Demo ideas">
+        <div className="demo-rail-label">
+          <span>TRY A DEMO</span>
+          <b>→</b>
+        </div>
         <div className="hand-grid">
           {examples.map((x, i) => (
             <button
@@ -1087,20 +1107,12 @@ export default function PivotApp({
             <span>01</span>
             <h3>READ THE ROOM</h3>
             <p>
-              Map tracks, judging criteria, sponsors, and the ecosystem around
-              the idea.
+              Map tracks, judging criteria, sponsors, comparable products, and
+              real user signals before judging the idea.
             </p>
           </article>
           <article>
             <span>02</span>
-            <h3>SEARCH THE LANDSCAPE</h3>
-            <p>
-              Collect comparable products, real user signals, and first-party
-              evidence before making a call.
-            </p>
-          </article>
-          <article>
-            <span>03</span>
             <h3>CHASE THE GAPS</h3>
             <p>
               Save Round 1, find what is missing, then run a second search
@@ -1108,7 +1120,7 @@ export default function PivotApp({
             </p>
           </article>
           <article>
-            <span>04</span>
+            <span>03</span>
             <h3>MAKE THE CALL</h3>
             <p>
               Score hackathon edge and real-world edge separately. Then
@@ -1143,33 +1155,21 @@ export default function PivotApp({
             <span>AVG SCORE DEVIATION</span>
           </div>
           <div>
-            <b>{(benchmarkSummary.medianMs / 1000).toFixed(1)}s</b>
-            <span>FIXTURE MEDIAN</span>
+            <b>{benchmarkSummary.cases}</b>
+            <span>CASES</span>
           </div>
           <div>
             <b>{benchmarkSummary.schemaSuccess}%</b>
             <span>SCHEMA VALID</span>
           </div>
         </div>
-        <div className="benchmark-table">
-          <div className="table-row table-head">
-            <span>CASE</span>
-            <span>EXPECTED</span>
-            <span>MODEL</span>
-            <span>PRIMARY WEAKNESS</span>
-          </div>
-          {benchmarkCases.map((c) => (
-            <div
-              className={`table-row ${c.expected !== c.model ? "miss" : ""}`}
-              key={c.name}
-            >
-              <b>{c.name}</b>
-              <span>{c.expected}</span>
-              <span>{c.model}</span>
-              <p>{c.weakness}</p>
-            </div>
-          ))}
-        </div>
+        <BenchmarkLedger cases={benchmarkPreview} />
+        <details className="benchmark-disclosure">
+          <summary>
+            VIEW ALL 15 BENCHMARK CASES <span>↓</span>
+          </summary>
+          <BenchmarkLedger cases={benchmarkCases} />
+        </details>
         <p className="cost-note">
           Checked-in fixture baseline; it has not been rerun as a 15-call live
           benchmark against the final model. Estimated live inference cost /
@@ -1179,6 +1179,30 @@ export default function PivotApp({
       </section>
       <Footer />
     </main>
+  );
+}
+
+function BenchmarkLedger({ cases }: { cases: typeof benchmarkCases }) {
+  return (
+    <div className="benchmark-table">
+      <div className="table-row table-head">
+        <span>CASE</span>
+        <span>EXPECTED</span>
+        <span>MODEL</span>
+        <span>PRIMARY WEAKNESS</span>
+      </div>
+      {cases.map((benchmarkCase) => (
+        <div
+          className={`table-row ${benchmarkCase.expected !== benchmarkCase.model ? "miss" : ""}`}
+          key={benchmarkCase.name}
+        >
+          <b>{benchmarkCase.name}</b>
+          <span>{benchmarkCase.expected}</span>
+          <span>{benchmarkCase.model}</span>
+          <p>{benchmarkCase.weakness}</p>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -1218,12 +1242,12 @@ function StatusBank({
     <div className="status-bank">
       <div className="bank-lines">
         <span>
-          <i className={mode === "running" ? "warm" : ""} /> RESEARCH BANK{" "}
-          <b>{mode === "running" ? "REQUESTED" : "STANDBY"}</b>
+          <i className={mode === "running" ? "warm" : ""} /> RESEARCH{" "}
+          <b>{mode === "running" ? "ACTIVE" : "WAITING"}</b>
         </span>
         <span>
-          <i className={mode === "running" ? "warm" : ""} /> MODEL BANK{" "}
-          <b>{mode === "running" ? "AWAITING" : "STANDBY"}</b>
+          <i className={mode === "running" ? "warm" : ""} /> MENTOR{" "}
+          <b>{mode === "running" ? "ACTIVE" : "WAITING"}</b>
         </span>
         <span>
           <i
@@ -1232,10 +1256,10 @@ function StatusBank({
           WORKFLOW{" "}
           <b>
             {mode === "running"
-              ? "RUNNING"
+              ? "ACTIVE"
               : mode === "ready"
                 ? "READY"
-                : "LOCKED"}
+                : "WAITING"}
           </b>
         </span>
       </div>
@@ -1343,9 +1367,15 @@ function MentorReceipt({ report }: { report: MentorReport }) {
         <b>{report.score}/100</b>
       </div>
       <div className="receipt-odds">
-        <span>HACKATHON EDGE <b>{report.hackathonEdge}</b></span>
-        <span>REAL-WORLD EDGE <b>{report.realWorldEdge}</b></span>
-        <span>CONFIDENCE <b>{report.confidence}%</b></span>
+        <span>
+          HACKATHON EDGE <b>{report.hackathonEdge}</b>
+        </span>
+        <span>
+          REAL-WORLD EDGE <b>{report.realWorldEdge}</b>
+        </span>
+        <span>
+          CONFIDENCE <b>{report.confidence}%</b>
+        </span>
       </div>
       <section>
         <small>THE HARD TRUTH</small>
@@ -1355,6 +1385,20 @@ function MentorReceipt({ report }: { report: MentorReport }) {
         <small>BUILD THIS VERSION</small>
         <p>{report.pivot}</p>
       </section>
+      <div className="receipt-actions">
+        {report.nearMiss && (
+          <span>
+            <small>THE NEAR MISS</small>
+            {report.nearMiss.points} point
+            {report.nearMiss.points === 1 ? "" : "s"} from{" "}
+            {report.nearMiss.nextVerdict}
+          </span>
+        )}
+        <span>
+          <small>NEXT MOVE</small>
+          {report.nextValidation[0]}
+        </span>
+      </div>
       <div className="receipt-footer">
         <span>INPUT → EVIDENCE → JUDGMENT → OUTPUT</span>
         <b>KEEP THIS RECEIPT.</b>
@@ -1365,15 +1409,43 @@ function MentorReceipt({ report }: { report: MentorReport }) {
 function Footer() {
   return (
     <>
-      <section className="infrastructure" aria-labelledby="infrastructure-title">
+      <section
+        className="infrastructure"
+        aria-labelledby="infrastructure-title"
+      >
         <div>
           <div className="section-kicker">THE REAL MACHINE ROOM</div>
-          <h2 id="infrastructure-title">THREE SYSTEMS.<br />ONE HONEST VERDICT.</h2>
+          <h2 id="infrastructure-title">
+            THREE SYSTEMS.
+            <br />
+            ONE HONEST VERDICT.
+          </h2>
         </div>
         <div className="infrastructure-grid">
-          <article><span>01</span><h3>LINKUP</h3><p>Researches the event, landscape, competitors, and missing evidence.</p></article>
-          <article><span>02</span><h3>NEBIUS</h3><p>Turns grounded evidence into ten mentor judgments and clear advice.</p></article>
-          <article><span>03</span><h3>RENDER</h3><p>Runs the multi-step workflow with task-level retries and idempotency.</p></article>
+          <article>
+            <span>01</span>
+            <h3>LINKUP</h3>
+            <p>
+              Researches the event, landscape, competitors, and missing
+              evidence.
+            </p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>NEBIUS</h3>
+            <p>
+              Turns grounded evidence into ten mentor judgments and clear
+              advice.
+            </p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>RENDER</h3>
+            <p>
+              Runs the multi-step workflow with task-level retries and
+              idempotency.
+            </p>
+          </article>
         </div>
       </section>
       <footer>
