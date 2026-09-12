@@ -31,7 +31,7 @@ export class LinkupResearchProvider implements ResearchProvider {
     return gaps.slice(0,4).length?gaps.slice(0,4):['Validate the most important claims with direct target-user evidence'];
   }
   async followUpSearch(gaps:string[],input:AnalysisInput):Promise<ResearchRound>{
-    const targetDomain=this.targetDomain(input),queries=gaps.slice(0,3).map(gap=>`${gap}. Target project: ${input.idea}${targetDomain?`. Supplied hackathon domain: ${targetDomain}`:''}`);
+    const targetDomain=this.targetDomain(input),queries=gaps.slice(0,3).map(gap=>targetDomain&&/hackathon|event|track|sponsor|judg|prize|deadline|submission/i.test(gap)?`site:${targetDomain} ${gap}`:`${gap}. Target project: ${input.idea}`);
     const batches=await Promise.all(queries.map(query=>this.search(query)));
     const findings=this.dedupe(batches.flatMap((results,index)=>this.normalize(results,queries[index],2,'Gap-directed follow-up',targetDomain))).slice(0,9);
     return{round:2,focus:'Gap-directed follow-up research',queries,findings,gaps:findings.length?['Direct interviews or usage data remain unverified by desk research']:['Research provider returned no follow-up results; the identified gaps remain UNKNOWN']};

@@ -116,8 +116,9 @@ describe('providers and schemas',()=>{
     expect(queries).toHaveLength(2);expect(queries[0]).toContain('site:burning-token.example');expect(queries[0]).not.toContain(input.idea);expect(queries[1]).toContain(input.idea);expect(queries[1]).not.toContain(input.hackathonUrl);
     expect(round.findings[0]).toMatchObject({confidence:92,relationship:'Target event · first-party'});expect(round.findings[1].relationship).toBe('Idea landscape');
     const gaps=await provider.identifyEvidenceGaps(round,input);expect(gaps.some(gap=>gap.includes('Verify the supplied hackathon'))).toBe(false);
-    fetchMock.mockResolvedValue(new Response(JSON.stringify({results:[]}),{status:200,headers:{'Content-Type':'application/json'}}));const followUp=await provider.followUpSearch(gaps,input);
+    fetchMock.mockImplementation(async()=>new Response(JSON.stringify({results:[]}),{status:200,headers:{'Content-Type':'application/json'}}));const followUp=await provider.followUpSearch(gaps,input);
     expect(followUp.queries[0]).toContain(gaps[0]);expect(JSON.parse(String(fetchMock.mock.calls[2][1]?.body)).q).toContain(gaps[0]);
+    const eventFollowUp=await provider.followUpSearch(['Verify the target hackathon tracks and judging criteria'],input);expect(eventFollowUp.queries[0]).toBe('site:burning-token.example Verify the target hackathon tracks and judging criteria');expect(eventFollowUp.queries[0]).not.toContain(input.idea);
   });
 });
 
