@@ -6,7 +6,7 @@ PIVOT! is an AI hackathon mentor that researches before it judges. It verifies t
 
 The problem is not a lack of ideas. It is spending a scarce hackathon weekend on an idea that is vague, undifferentiated, impossible to demonstrate, or padded with decorative sponsor integrations.
 
-**[Try the public Demo Mode](https://pivot-idea-casino.valecreativo.chatgpt.site/)** · [Architecture](#architecture) · [Sponsor integrations](#sponsor-integrations) · [Demo scripts](docs/DEMO-SCRIPT.md)
+**[Open the hosted Demo Mode](https://pivot-idea-casino.valecreativo.chatgpt.site/)** · [Architecture](#architecture) · [Sponsor integrations](#sponsor-integrations) · [Demo scripts](docs/DEMO-SCRIPT.md)
 
 ## How it works
 
