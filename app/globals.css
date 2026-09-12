@@ -242,3 +242,28 @@ footer{border-color:var(--ink);color:#5d574f}
 @media(max-width:768px){.process-wrap{padding-top:35px}.process-layout{gap:35px}.dimension-board{grid-template-columns:1fr}.score-ribbon div:last-child{grid-column:1/-1}.infrastructure-grid{grid-template-columns:1fr}.infrastructure-grid article{border-right:0;border-bottom:1px solid var(--ink)}.receipt-odds{grid-template-columns:1fr 1fr}.mentor-receipt{width:min(620px,88vw)}.report-disclosure>summary b{float:none;display:block;margin-top:5px}.method{grid-template-columns:1fr;gap:25px}.method-steps article{padding:18px 0}}
 @media(max-width:560px){.hero-copy{padding-top:0}.hero-lede{font-size:19px!important;margin-top:20px!important}.hero-grid{gap:20px}.machine-stage{padding:8px 0 76px}.machine-lever{top:auto;right:8px;bottom:-3px;width:152px;height:70px;transform:none}.lever-label{top:auto;right:146px;bottom:24px;width:92px;text-align:right}.lever-bracket{right:0;bottom:0;width:66px;height:58px}.lever-joint{right:16px;bottom:10px}.lever-arm{right:56px;bottom:26px;width:95px;height:11px;transform-origin:100% 50%;transform:rotate(calc(var(--lever-pull) * 28deg));transition:transform .16s}.lever-handle{right:126px;bottom:11px;width:42px;height:48px;transform-origin:105px 50%;transform:rotate(calc(var(--lever-pull) * 28deg))}.landing-wrap{padding-left:12px;padding-right:12px}.landing-machine{width:94vw;border-width:5px}.landing-reels{padding:11px}.landed-reel{height:82px}.landed-reel b{font-size:36px}.verdict-shutter{padding:13px}.mentor-receipt{width:89vw;padding:19px 18px}.receipt-verdict strong{font-size:38px}.receipt-odds{grid-template-columns:1fr 1fr}.mentor-receipt section p{font-size:15px}.open-report{font-size:10px}.verdict-grid{grid-template-columns:1fr}.score-dial{width:180px}.report-body{gap:20px}.report-section{padding:38px 0}.report-section>header{grid-template-columns:38px 1fr}.infrastructure{padding-top:65px;padding-bottom:65px}}
 @media(prefers-reduced-motion:reduce){.mentor-receipt{animation:none}.open-report{transition:none}}
+
+/* Final restraint pass: one composed idea machine, fewer interface labels */
+.hero{padding-top:24px;padding-bottom:12px}
+.eyebrow{margin-bottom:12px}
+.hero-grid{grid-template-columns:minmax(330px,.78fr) minmax(570px,1.22fr);gap:clamp(36px,5vw,72px)}
+.hero-copy{padding-top:12px}
+.hero-copy h1{font-size:clamp(58px,5.7vw,82px);line-height:.86}
+.hero-detail{max-width:390px!important;margin:26px 0 20px!important;color:#3f3a34!important;font:19px/1.48 var(--font-display),Georgia,serif!important}
+.credibility{margin-top:0}
+.machine-stage{padding-top:6px;padding-bottom:8px}
+.machine-cap{min-height:46px;padding:0 23px;font-size:12px}
+.machine-reels{padding:11px 22px 10px}
+.reel-window{height:62px}
+.machine-deck{padding:0 22px 13px}
+.machine-intake-label{display:flex;align-items:center;justify-content:space-between;height:31px;border-bottom:1px solid #9b8b75;color:#39342e;font:800 10px var(--font-machine),sans-serif;letter-spacing:.12em}
+.ready-lamp{display:grid;place-items:center;width:24px;height:24px}.ready-lamp i{width:8px;height:8px;border:1px solid var(--ink);border-radius:50%;background:#746e64}.ready-lamp i.active{background:var(--green);box-shadow:0 0 0 3px #f5e8d3,0 0 0 4px var(--ink)}
+.intake-machine label{margin:7px 0 4px}
+.intake-machine input,.intake-machine textarea{padding:8px 11px}
+.intake-machine textarea{min-height:62px}
+.intake-machine details{margin:1px 0 0;padding:7px 2px}
+.run-button{min-height:49px;margin-top:4px;grid-template-columns:1fr 32px;padding:0 17px;font-size:18px;text-align:center}
+.ticket-slot{display:flex;align-items:center;justify-content:center;height:18px;margin:9px 20% 0;border:2px solid var(--ink);border-bottom-width:4px;background:#51483c;color:#efe2cf;font:800 7px var(--font-machine),sans-serif;letter-spacing:.16em}
+.lever-label{top:49px}.machine-lever{top:66px}
+
+@media(min-width:1081px) and (max-height:820px){.topbar{height:54px}.hero{padding-top:18px}.hero-copy{padding-top:7px}.hero-copy h1{font-size:clamp(56px,5.35vw,76px)}.hero-detail{margin:20px 0 16px!important}.machine-stage{padding-top:0}.demo-hands{padding-top:4px}}

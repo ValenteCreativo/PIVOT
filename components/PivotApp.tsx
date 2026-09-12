@@ -880,22 +880,10 @@ export default function PivotApp({
               <br />
               <em>BEFORE</em> YOU BUILD.
             </h1>
-            <p className="hero-lede">
-              Most hackathon ideas die Sunday night. PIVOT tells you Saturday
-              morning.
-            </p>
             <p className="hero-detail">
-              Research the room, pressure-test the build, and find the version
-              worth your next 36 hours.
+              Research the hackathon. Pressure-test the idea. Build the version
+              worth your weekend.
             </p>
-            <button
-              className="text-link"
-              onClick={() =>
-                intakeRef.current?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              ↓ STEP UP TO THE MACHINE
-            </button>
             <div className="credibility">
               Built from real hackathon mentoring workflows.
             </div>
@@ -913,8 +901,7 @@ export default function PivotApp({
               }}
             >
               <div className="machine-cap">
-                <span>PIVOT! // IDEA VALIDATION MACHINE</span>
-                <b>UNIT 001</b>
+                <span>PIVOT! — IDEA VALIDATION MACHINE</span>
               </div>
               <div className="machine-screws" aria-hidden="true">
                 <i />
@@ -927,32 +914,22 @@ export default function PivotApp({
                 labels={["IDEA", "EDGE", "RISK"]}
               />
               <div className="machine-deck">
-                <div className="terminal-head">
-                  <span>FEED THE MACHINE</span>
-                  <span className="live-label">
-                    <i /> {canRun ? "READY" : "STANDBY"}
+                <div className="machine-intake-label">
+                  <span>INSERT YOUR IDEA</span>
+                  <span className="ready-lamp" aria-label={canRun ? "Ready" : "Waiting for an idea"}>
+                    <i className={canRun ? "active" : ""} />
                   </span>
                 </div>
-                <label htmlFor="demo-idea">DEMO TICKET</label>
-                <select
-                  id="demo-idea"
-                  value=""
-                  onChange={(event) => {
-                    const selected = examples.find(
-                      (example) => example.label === event.target.value,
-                    );
-                    if (selected) setForm({ ...form, idea: selected.idea });
-                  }}
-                >
-                  <option value="">Choose a sample idea…</option>
-                  {examples.map((example) => (
-                    <option key={example.label} value={example.label}>
-                      {example.label}
-                    </option>
-                  ))}
-                </select>
+                <label htmlFor="idea">YOUR IDEA</label>
+                <textarea
+                  id="idea"
+                  value={form.idea}
+                  onChange={(e) => setForm({ ...form, idea: e.target.value })}
+                  placeholder="Describe the rough idea you are betting the weekend on…"
+                  rows={3}
+                />
                 <label htmlFor="hackathon">
-                  HACKATHON <small>OPTIONAL IN DEMO</small>
+                  HACKATHON / EVENT <small>OPTIONAL IN DEMO</small>
                 </label>
                 <input
                   id="hackathon"
@@ -963,33 +940,9 @@ export default function PivotApp({
                   }
                   placeholder="https://your-hackathon.com"
                 />
-                <label htmlFor="idea">YOUR BET</label>
-                <textarea
-                  id="idea"
-                  value={form.idea}
-                  onChange={(e) => setForm({ ...form, idea: e.target.value })}
-                  placeholder="Describe the rough idea you are betting the weekend on…"
-                  rows={3}
-                />
-                <div className="constraint-readout" aria-hidden="true">
-                  <span>
-                    <b>TEAM</b>
-                    {form.teamSize}
-                  </span>
-                  <span>
-                    <b>TIME</b>
-                    {form.hours}h
-                  </span>
-                  <span>
-                    <b>GOAL</b>
-                    {form.goal
-                      .replace("Win sponsor track", "WIN TRACK")
-                      .toUpperCase()}
-                  </span>
-                </div>
                 <details>
                   <summary>
-                    ADJUST BUILD CONSTRAINTS <span>OPEN +</span>
+                    TEAM CONSTRAINTS <span>+</span>
                   </summary>
                   <div className="constraint-grid">
                     <label>
@@ -1055,14 +1008,11 @@ export default function PivotApp({
                     <span /> SIMULATE RECOVERY
                   </label>
                 )}
-                <StatusBank elapsed={0} mode={canRun ? "ready" : "standby"} />
                 <button className="run-button" type="submit" disabled={!canRun}>
-                  <span className="run-icon">↵</span>
-                  <span>
-                    <small>KEYBOARD / ACCESSIBLE CONTROL</small>RUN THE ODDS
-                  </span>
+                  <span>RUN THE ODDS</span>
                   <span className="arrow">→</span>
                 </button>
+                <div className="ticket-slot" aria-hidden="true"><span>MENTOR REPORT</span></div>
                 {error && <p className="form-error">{error}</p>}
               </div>
             </form>
