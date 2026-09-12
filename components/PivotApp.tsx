@@ -11,27 +11,27 @@ import type {
 
 const examples = [
   {
-    label: "AI CLIMATE APP",
+    label: "CLIMATE AI\nFOR CITIES",
     idea: "An AI app that helps people reduce their carbon footprint.",
     tag: "PIVOT",
   },
   {
-    label: "ONCHAIN REPUTATION",
+    label: "ONCHAIN\nREPUTATION",
     idea: "An onchain reputation system for open-source contributors.",
     tag: "DOUBLE DOWN",
   },
   {
-    label: "TIKTOK INTELLIGENCE",
+    label: "TIKTOK TOOL\nFOR CREATORS",
     idea: "An AI tool that tells TikTok creators what content to make next.",
     tag: "DOUBLE DOWN",
   },
   {
-    label: "MULTIPLAYER FOCUS",
+    label: "MULTIPLAYER\nSTUDY APP",
     idea: "A multiplayer focus room where remote teams race to finish one task together.",
     tag: "NEAR MISS",
   },
   {
-    label: "RIDICULOUS PITCH DEALER",
+    label: "DEVINFRA FOR\nHACKATHONS",
     idea: "A ridiculous live pitch dealer that turns rambling hackathon ideas into a sharp 20-second pitch.",
     tag: "ALL IN",
   },
@@ -119,6 +119,166 @@ function Meter({
 function Pill({ children }: { children: React.ReactNode }) {
   return <span className="pill">{children}</span>;
 }
+
+// American-traditional / screenprint influenced inline icons (no icon library)
+function ReelIcon({ name }: { name: "idea" | "viability" | "impact" }) {
+  if (name === "idea")
+    return (
+      <svg viewBox="0 0 48 48" className="reel-glyph" aria-hidden="true">
+        <path
+          d="M24 6c-8 0-14 6-14 13 0 5 2 8 5 11 2 2 3 4 3 7h12c0-3 1-5 3-7 3-3 5-6 5-11 0-7-6-13-14-13z"
+          fill="#c9932d"
+          stroke="#151513"
+          strokeWidth="2.4"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M18 37h12M19 41h10"
+          stroke="#151513"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M24 15v10M20 20l4 5 4-5"
+          stroke="#151513"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <path
+          d="M8 12l4 2M40 12l-4 2M24 2v4"
+          stroke="#8f2425"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  if (name === "viability")
+    return (
+      <svg viewBox="0 0 48 48" className="reel-glyph" aria-hidden="true">
+        <path
+          d="M27 4L11 27h9l-3 17 20-25h-10l3-15z"
+          fill="#c9932d"
+          stroke="#151513"
+          strokeWidth="2.4"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  return (
+    <svg viewBox="0 0 48 48" className="reel-glyph" aria-hidden="true">
+      <path
+        d="M24 4l5.3 12.5L43 17.6l-10.4 8.9 3.3 13.6L24 32.8 12.1 40l3.3-13.6L5 17.6l13.7-1.1z"
+        fill="#8f2425"
+        stroke="#151513"
+        strokeWidth="2.4"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M24 14l2.6 6.2 6.7.5-5.1 4.4 1.6 6.6L24 28.6 18.2 32l1.6-6.6-5.1-4.4 6.7-.5z"
+        fill="#f3eadb"
+        stroke="#151513"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CredIcon({ name }: { name: "research" | "eval" | "run" }) {
+  if (name === "research")
+    return (
+      <svg viewBox="0 0 32 32" className="cred-glyph" aria-hidden="true">
+        <circle
+          cx="14"
+          cy="14"
+          r="8"
+          fill="none"
+          stroke="#8f2425"
+          strokeWidth="2.6"
+        />
+        <path
+          d="M20 20l7 7"
+          stroke="#8f2425"
+          strokeWidth="2.6"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  if (name === "eval")
+    return (
+      <svg viewBox="0 0 32 32" className="cred-glyph" aria-hidden="true">
+        <path
+          d="M16 4c5 0 9 3 9 8 0 3-2 5-2 8 0 2 1 3 1 5H8c0-2 1-3 1-5 0-3-2-5-2-8 0-5 4-8 9-8z"
+          fill="none"
+          stroke="#8f2425"
+          strokeWidth="2.4"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M12 25h8"
+          stroke="#8f2425"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  return (
+    <svg viewBox="0 0 32 32" className="cred-glyph" aria-hidden="true">
+      <circle
+        cx="16"
+        cy="16"
+        r="10"
+        fill="none"
+        stroke="#8f2425"
+        strokeWidth="2.6"
+      />
+      <path
+        d="M16 8v8l6 4"
+        fill="none"
+        stroke="#8f2425"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+const credibility = [
+  { icon: "research", title: "WEB RESEARCH", via: "via Linkup" },
+  { icon: "eval", title: "AI EVALUATION", via: "via Nebius" },
+  { icon: "run", title: "RELIABLE EXECUTION", via: "via Render" },
+] as const;
+
+const processSteps = [
+  {
+    n: "01",
+    title: "UNDERSTAND\nTHE EVENT",
+    body: "Tracks, sponsors, judging criteria.",
+  },
+  {
+    n: "02",
+    title: "RESEARCH\nTHE LANDSCAPE",
+    body: "Find evidence, competitors, precedent.",
+  },
+  {
+    n: "03",
+    title: "FIND\nTHE GAPS",
+    body: "Identify what is missing.",
+  },
+  {
+    n: "04",
+    title: "EVALUATE\n10 DIMENSIONS",
+    body: "From problem clarity to impact.",
+  },
+  {
+    n: "05",
+    title: "GET YOUR\nVERDICT",
+    body: "Fold, Pivot, Double Down or All In.",
+  },
+];
 
 export default function PivotApp({
   initialMode,
@@ -435,8 +595,11 @@ export default function PivotApp({
             <em>WEIGHING THE BET.</em>
           </h1>
           <div className="process-layout">
-            <div className="process-machine">
-              <div className="machine-plate">PIVOT! — IDEA MACHINE</div>
+            <div className="intake-machine process-machine">
+              <div className="machine-plate">
+                <b>PIVOT!</b>
+                <span>WEIGHING THE BET</span>
+              </div>
               <MachineReels
                 values={[
                   reelLabels[reelIndex % reelLabels.length],
@@ -834,7 +997,7 @@ export default function PivotApp({
                   );
                 }}
               >
-                DEAL ANOTHER IDEA
+RUN ANOTHER IDEA
               </button>
               <hr />
               <h3>HOW THIS ANALYSIS RAN</h3>
@@ -885,31 +1048,67 @@ export default function PivotApp({
   return (
     <main className="site-shell">
       <Header sound={sound} setSound={setSound} mode={initialMode} />
-      <section id="top" className="hero">
-        <div className="eyebrow">
-          <span>01</span> HACKATHON IDEA VALIDATOR
+      <section id="top" className="hero poster">
+        <div className="poster-headline">
+          <span className="headline-star" aria-hidden="true">
+            ✦
+          </span>
+          <h1>
+            CHECK THE <em>ODDS</em>
+            <br />
+            BEFORE YOU BUILD.
+          </h1>
+          <p className="headline-sub">
+            Most hackathon ideas die Sunday night. PIVOT tells you Saturday
+            morning.
+          </p>
         </div>
-        <div className="hero-grid">
-          <div className="hero-copy">
-            <h1>
-              CHECK THE ODDS
-              <br />
-              <em>BEFORE</em> YOU BUILD.
-            </h1>
-            <p className="hero-detail">
-              Research the hackathon. Pressure-test the idea. Build the version
-              worth your weekend.
-            </p>
-            <div className="credibility">
-              Built from real hackathon mentoring workflows.
+
+        <div className="poster-grid">
+          <aside className="poster-left" aria-label="Why PIVOT">
+            <div className="margin-list" aria-hidden="true">
+              <span>IDEAS</span>
+              <span>HACKATHONS</span>
+              <span>BUILDERS</span>
+              <span>A BRIGHTER TOMORROW</span>
             </div>
-          </div>
+            <h2 className="editorial-head">
+              REAL
+              <br />
+              RESEARCH.
+              <br />
+              REAL
+              <br />
+              ADVICE.
+            </h2>
+            <p className="editorial-body">
+              PIVOT researches the hackathon, investigates your idea, and
+              pressure-tests the build before giving you a clear verdict and
+              plan.
+            </p>
+            <ul className="cred-markers">
+              {credibility.map((c) => (
+                <li key={c.title}>
+                  <CredIcon name={c.icon} />
+                  <div>
+                    <b>{c.title}</b>
+                    <span>{c.via}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="margin-script" aria-hidden="true">
+              Better ideas build
+              <br />a brighter tomorrow.
+            </p>
+          </aside>
+
           <div
             className={`machine-stage ${canRun ? "machine-ready" : "machine-idle"}`}
             ref={intakeRef}
           >
             <form
-              className="terminal intake-machine"
+              className="intake-machine"
               aria-label="Idea analysis form"
               onSubmit={(event) => {
                 event.preventDefault();
@@ -917,7 +1116,16 @@ export default function PivotApp({
               }}
             >
               <div className="machine-cap">
-                <span>PIVOT! — IDEA VALIDATION MACHINE</span>
+                <span className="cap-star" aria-hidden="true">
+                  ✦
+                </span>
+                <span className="cap-title">
+                  <b>PIVOT!</b>
+                  <span className="cap-sub">IDEA VALIDATION MACHINE</span>
+                </span>
+                <span className="cap-star" aria-hidden="true">
+                  ✦
+                </span>
               </div>
               <div className="machine-screws" aria-hidden="true">
                 <i />
@@ -926,68 +1134,73 @@ export default function PivotApp({
                 <i />
               </div>
               <MachineReels
-                values={["?", "?", "?"]}
-                labels={["IDEA", "EDGE", "RISK"]}
+                values={["IDEA", "VIABILITY", "IMPACT"]}
+                labels={["IDEA", "VIABILITY", "IMPACT"]}
+                glyphs={["idea", "viability", "impact"]}
               />
+              <p className="machine-motto" aria-hidden="true">
+                YOUR NEXT 36 HOURS ARE A BET. MAKE IT A GOOD ONE.
+              </p>
               <div className="machine-deck">
-                <div className="machine-intake-label">
-                  <span>INSERT YOUR IDEA</span>
+                <label htmlFor="idea" className="deck-lead">
+                  <span>YOUR IDEA</span>
                   <span
                     className="ready-lamp"
                     aria-label={canRun ? "Ready" : "Waiting for an idea"}
                   >
                     <i className={canRun ? "active" : ""} />
                   </span>
-                </div>
-                <label htmlFor="idea">YOUR IDEA</label>
+                </label>
                 <textarea
                   id="idea"
                   value={form.idea}
                   onChange={(e) => setForm({ ...form, idea: e.target.value })}
                   placeholder="Describe the rough idea you are betting the weekend on…"
-                  rows={3}
+                  rows={2}
                 />
-                <label htmlFor="hackathon">
-                  HACKATHON / EVENT <small>OPTIONAL IN DEMO</small>
-                </label>
-                <input
-                  id="hackathon"
-                  type="url"
-                  value={form.hackathonUrl}
-                  onChange={(e) =>
-                    setForm({ ...form, hackathonUrl: e.target.value })
-                  }
-                  placeholder="https://your-hackathon.com"
-                />
-                <details>
+                <div className="deck-controls">
+                  <label className="deck-url">
+                    HACKATHON / EVENT
+                    <input
+                      id="hackathon"
+                      type="url"
+                      value={form.hackathonUrl}
+                      onChange={(e) =>
+                        setForm({ ...form, hackathonUrl: e.target.value })
+                      }
+                      placeholder="https://your-hackathon.com"
+                    />
+                  </label>
+                  <label className="deck-num">
+                    TEAM
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={form.teamSize}
+                      onChange={(e) =>
+                        setForm({ ...form, teamSize: Number(e.target.value) })
+                      }
+                    />
+                  </label>
+                  <label className="deck-num">
+                    HOURS
+                    <input
+                      type="number"
+                      min="4"
+                      max="168"
+                      value={form.hours}
+                      onChange={(e) =>
+                        setForm({ ...form, hours: Number(e.target.value) })
+                      }
+                    />
+                  </label>
+                </div>
+                <details className="more-constraints">
                   <summary>
-                    TEAM CONSTRAINTS <span>+</span>
+                    MORE CONSTRAINTS <span aria-hidden="true">+</span>
                   </summary>
                   <div className="constraint-grid">
-                    <label>
-                      TEAM SIZE
-                      <input
-                        type="number"
-                        min="1"
-                        max="20"
-                        value={form.teamSize}
-                        onChange={(e) =>
-                          setForm({ ...form, teamSize: Number(e.target.value) })
-                        }
-                      />
-                    </label>
-                    <label>
-                      HOURS AVAILABLE
-                      <input
-                        type="number"
-                        min="4"
-                        max="168"
-                        value={form.hours}
-                        onChange={(e) =>
-                          setForm({ ...form, hours: Number(e.target.value) })
-                        }
-                      />
-                    </label>
                     <label className="wide">
                       TECHNICAL STRENGTHS
                       <input
@@ -1013,23 +1226,28 @@ export default function PivotApp({
                         <option>Ship fastest possible MVP</option>
                       </select>
                     </label>
+                    {initialMode === "demo" && (
+                      <label className="failure-toggle wide">
+                        <input
+                          type="checkbox"
+                          checked={form.simulateFailure}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              simulateFailure: e.target.checked,
+                            })
+                          }
+                        />
+                        <span /> SIMULATE RECOVERY
+                      </label>
+                    )}
                   </div>
                 </details>
-                {initialMode === "demo" && (
-                  <label className="failure-toggle">
-                    <input
-                      type="checkbox"
-                      checked={form.simulateFailure}
-                      onChange={(e) =>
-                        setForm({ ...form, simulateFailure: e.target.checked })
-                      }
-                    />
-                    <span /> SIMULATE RECOVERY
-                  </label>
-                )}
                 <button className="run-button" type="submit" disabled={!canRun}>
                   <span>RUN THE ODDS</span>
-                  <span className="arrow">→</span>
+                  <span className="arrow" aria-hidden="true">
+                    →
+                  </span>
                 </button>
                 <div className="ticket-slot" aria-hidden="true">
                   <span>MENTOR REPORT</span>
@@ -1037,10 +1255,28 @@ export default function PivotApp({
                 {error && <p className="form-error">{error}</p>}
               </div>
             </form>
-            <div className="lever-label">
-              PULL TO RUN
+            <div className="lever-label" aria-hidden="true">
+              PULL
+              <br />
+              TO RUN
               <br />
               THE ODDS
+              <svg viewBox="0 0 40 34" className="lever-arrow">
+                <path
+                  d="M4 6c14 2 24 10 28 22"
+                  fill="none"
+                  stroke="#151513"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M32 28l1-9M32 28l-9 2"
+                  fill="none"
+                  stroke="#151513"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                />
+              </svg>
             </div>
             <button
               className={`machine-lever ${leverSnap ? "snapping" : ""}`}
@@ -1067,29 +1303,61 @@ export default function PivotApp({
               Enter submits the form.
             </span>
           </div>
+
+          <aside className="poster-right" aria-label="How PIVOT thinks">
+            <div className="margin-list right" aria-hidden="true">
+              <span>CLEARER IDEAS</span>
+              <span>STRONGER BUILDS</span>
+              <span>HAPPIER HACKERS</span>
+            </div>
+            <ol className="process-column">
+              {processSteps.map((s) => (
+                <li key={s.n}>
+                  <span className="process-num" aria-hidden="true">
+                    {s.n}
+                  </span>
+                  <div>
+                    <b>
+                      {s.title.split("\n").map((line, li) => (
+                        <span className="process-line" key={li}>
+                          {line}
+                        </span>
+                      ))}
+                    </b>
+                    <p>{s.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </aside>
         </div>
-      </section>
-      <section className="demo-hands" aria-label="Demo ideas">
-        <div className="demo-rail-label">
-          <span>TRY A DEMO</span>
-          <b>→</b>
+
+        <div className="poster-rail" aria-label="Demo ideas">
+          <span className="rail-lead">OR TRY A DEMO IDEA</span>
+          <div className="hand-grid">
+            {examples.map((x, i) => (
+              <button
+                key={x.label}
+                onClick={() => {
+                  setForm({ ...form, idea: x.idea });
+                  intakeRef.current?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                <span>0{i + 1}</span>
+                <b>
+                  {x.label.split("\n").map((line, li) => (
+                    <span className="ticket-line" key={li}>
+                      {line}
+                    </span>
+                  ))}
+                </b>
+                <small>{x.tag}</small>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="hand-grid">
-          {examples.map((x, i) => (
-            <button
-              key={x.label}
-              onClick={() => {
-                setForm({ ...form, idea: x.idea });
-                intakeRef.current?.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
-              <span>0{i + 1}</span>
-              <b>{x.label}</b>
-              <small>{x.tag}</small>
-              <i>→</i>
-            </button>
-          ))}
-        </div>
+
+        <div className="poster-flash" aria-hidden="true" />
       </section>
       <section id="method" className="method">
         <div>
@@ -1210,10 +1478,12 @@ function MachineReels({
   values,
   labels,
   spinning = false,
+  glyphs,
 }: {
   values: string[];
   labels: string[];
   spinning?: boolean;
+  glyphs?: ("idea" | "viability" | "impact")[];
 }) {
   return (
     <div
@@ -1223,9 +1493,16 @@ function MachineReels({
       {values.map((value, index) => (
         <div className="machine-reel" key={`${labels[index]}-${index}`}>
           <div className="reel-window">
-            <span>{value}</span>
+            {glyphs ? (
+              <span className="reel-face">
+                <ReelIcon name={glyphs[index]} />
+                <b className="reel-name">{labels[index]}</b>
+              </span>
+            ) : (
+              <span>{value}</span>
+            )}
           </div>
-          <b>{labels[index]}</b>
+          {!glyphs && <b>{labels[index]}</b>}
         </div>
       ))}
     </div>
@@ -1284,23 +1561,38 @@ function Header({
 }) {
   return (
     <nav className="topbar" aria-label="Primary navigation">
-      <a className="brand" href="#top">
-        <span className="brand-mark">P!</span>
-        <span>PIVOT!</span>
-      </a>
-      <div className="header-links">
-        <a href="#method">METHOD</a>
-        <a href="#benchmark">BENCHMARK</a>
+      <div className="brand-lockup">
+        <a className="brand" href="#top">
+          PIVOT!
+        </a>
+        <span className="brand-rule" aria-hidden="true" />
+        <span className="brand-tag">
+          AI MENTOR
+          <br />
+          FOR HACKATHON
+          <br />
+          IDEAS
+        </span>
       </div>
-      <div className="nav-meta">
-        <span className="status-dot" />
-        <span>{mode.toUpperCase()} MODE</span>
-        <button
-          aria-label={`${sound ? "Mute" : "Enable"} sounds`}
-          onClick={() => setSound(!sound)}
-        >
-          {sound ? "SOUND ON" : "SOUND OFF"}
-        </button>
+      <div className="nav-right">
+        <div className="header-links">
+          <a href="#method">HOW IT WORKS</a>
+          <a href="#benchmark">BENCHMARK</a>
+          <a href="#about">ABOUT</a>
+        </div>
+        <div className="nav-meta">
+          <span className="status-dot" />
+          <span>{mode.toUpperCase()} MODE</span>
+          <button
+            aria-label={`${sound ? "Mute" : "Enable"} sounds`}
+            onClick={() => setSound(!sound)}
+          >
+            {sound ? "SOUND ON" : "SOUND OFF"}
+          </button>
+        </div>
+        <a className="try-demo" href="#top">
+          TRY A DEMO
+        </a>
       </div>
     </nav>
   );
@@ -1410,6 +1702,7 @@ function Footer() {
   return (
     <>
       <section
+        id="about"
         className="infrastructure"
         aria-labelledby="infrastructure-title"
       >
