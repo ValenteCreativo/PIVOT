@@ -1,0 +1,47 @@
+<svg width="260" height="230" viewBox="0 0 260 230" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rose and ribbon: good ideas go further">
+  <!-- American Traditional flash: rose + banner. Placeholder asset; can be replaced by a hand-illustrated SVG at this same path. -->
+  <defs>
+    <style>
+      .ink { fill: none; stroke: #151513; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+      .fill-red { fill: #8f2425; }
+      .fill-red-d { fill: #6c1a1a; }
+      .fill-leaf { fill: #244b3a; }
+      .fill-paper { fill: #f3eadb; }
+      .fill-gold { fill: #c9932d; }
+      .band { font: 800 15px 'Barlow Condensed', Arial, sans-serif; letter-spacing: .04em; fill: #151513; }
+    </style>
+  </defs>
+
+  <!-- leaves -->
+  <path class="fill-leaf" d="M52 96c-22-6-40 2-46 20 20 6 40-1 50-16z"/>
+  <path class="ink" d="M52 96c-22-6-40 2-46 20 20 6 40-1 50-16z"/>
+  <path class="fill-leaf" d="M208 96c22-6 40 2 46 20-20 6-40-1-50-16z"/>
+  <path class="ink" d="M208 96c22-6 40 2 46 20-20 6-40-1-50-16z"/>
+
+  <!-- rose bloom -->
+  <circle cx="130" cy="80" r="56" class="fill-red"/>
+  <circle cx="130" cy="80" r="56" class="ink"/>
+  <path class="fill-red-d" d="M130 40c22 0 40 18 40 40s-18 40-40 40-40-18-40-40 18-40 40-40z"/>
+  <path class="ink" d="M130 40c22 0 40 18 40 40s-18 40-40 40-40-18-40-40 18-40 40-40z"/>
+  <!-- petal spiral -->
+  <path class="fill-paper" d="M130 58c14 0 24 10 24 22 0 11-9 20-22 20-11 0-20-8-20-19 0-9 7-15 15-15 6 0 11 4 11 10 0 5-4 8-8 8"/>
+  <path class="ink" d="M130 58c14 0 24 10 24 22 0 11-9 20-22 20-11 0-20-8-20-19 0-9 7-15 15-15 6 0 11 4 11 10 0 5-4 8-8 8"/>
+  <path class="ink" d="M104 66c-8 6-12 16-10 27M156 66c8 6 12 16 10 27M112 108c8 6 20 8 30 4"/>
+
+  <!-- banner ribbon -->
+  <path class="fill-paper" d="M28 150l14-14 22 8 66-8 66 8 22-8 14 14-14 16-22-6-66 8-66-8-22 6z"/>
+  <path class="ink" d="M28 150l14-14 22 8 66-8 66 8 22-8 14 14-14 16-22-6-66 8-66-8-22 6z"/>
+  <path class="ink" d="M64 144v24M196 144v24"/>
+  <path class="fill-gold" d="M20 168l8-18 14 14z"/>
+  <path class="ink" d="M20 168l8-18 14 14zM240 168l-8-18-14 14z"/>
+  <path class="fill-gold" d="M240 168l-8-18-14 14z"/>
+
+  <text x="130" y="166" text-anchor="middle" class="band">GOOD IDEAS</text>
+  <text x="130" y="182" text-anchor="middle" class="band">GO FURTHER</text>
+
+  <!-- little stars -->
+  <path class="fill-gold" d="M46 40l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+  <path class="ink" d="M46 40l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+  <path class="fill-gold" d="M214 40l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+  <path class="ink" d="M214 40l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+</svg>
