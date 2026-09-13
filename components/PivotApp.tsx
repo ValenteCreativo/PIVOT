@@ -67,11 +67,7 @@ const anticipationLabels = [
   "CHECKING THE EVIDENCE",
   "PRESSURE-TESTING THE BUILD",
 ];
-const benchmarkPreview = [
-  benchmarkCases[1],
-  benchmarkCases[2],
-  benchmarkCases[6],
-];
+
 const defaultForm: AnalysisInput & { goal: string } = {
   hackathonUrl: "",
   idea: "",
@@ -1065,13 +1061,7 @@ RUN ANOTHER IDEA
         </div>
 
         <div className="poster-grid">
-          <aside className="poster-left" aria-label="Why PIVOT">
-            <div className="margin-list" aria-hidden="true">
-              <span>IDEAS</span>
-              <span>HACKATHONS</span>
-              <span>BUILDERS</span>
-              <span>A BRIGHTER TOMORROW</span>
-            </div>
+          <aside className="poster-left" aria-label="What PIVOT does">
             <h2 className="editorial-head">
               REAL
               <br />
@@ -1082,9 +1072,8 @@ RUN ANOTHER IDEA
               ADVICE.
             </h2>
             <p className="editorial-body">
-              PIVOT researches the hackathon, investigates your idea, and
-              pressure-tests the build before giving you a clear verdict and
-              plan.
+              It researches the event, investigates your idea, and
+              pressure-tests the build before calling the verdict.
             </p>
             <ul className="cred-markers">
               {credibility.map((c) => (
@@ -1098,8 +1087,7 @@ RUN ANOTHER IDEA
               ))}
             </ul>
             <p className="margin-script" aria-hidden="true">
-              Better ideas build
-              <br />a brighter tomorrow.
+              Build the right thing.
             </p>
           </aside>
 
@@ -1434,9 +1422,8 @@ RUN ANOTHER IDEA
             NOT JUST THE MODEL.
           </h2>
           <p>
-            This is a directional expert-judgment benchmark, not scientific
-            ground truth. Fifteen representative ideas test whether the
-            mentoring engine behaves sensibly, with disagreements left visible.
+            Fifteen representative ideas test whether the mentoring engine
+            behaves sensibly — with the disagreements left visible, not hidden.
           </p>
         </div>
         <div className="metric-grid">
@@ -1457,18 +1444,30 @@ RUN ANOTHER IDEA
             <span>SCHEMA VALID</span>
           </div>
         </div>
-        <BenchmarkLedger cases={benchmarkPreview} />
-        <details className="benchmark-disclosure">
-          <summary>
-            VIEW ALL 15 BENCHMARK CASES <span>↓</span>
-          </summary>
-          <BenchmarkLedger cases={benchmarkCases} />
-        </details>
+        <div
+          className="odds-rail"
+          aria-label={`All ${benchmarkCases.length} benchmark cases`}
+        >
+          <ul className="odds-track">
+            {benchmarkCases.map((c, i) => (
+              <BenchmarkTicket key={c.name} case={c} index={i} />
+            ))}
+            {benchmarkCases.map((c, i) => (
+              <BenchmarkTicket
+                key={`dup-${c.name}`}
+                case={c}
+                index={i}
+                aria-hidden
+              />
+            ))}
+          </ul>
+        </div>
         <p className="cost-note">
-          Checked-in fixture baseline; it has not been rerun as a 15-call live
-          benchmark against the final model. Estimated live inference cost /
-          evaluation: {benchmarkSummary.estimatedCost}; actual cost varies by
-          model and token use.
+          Directional expert-judgment fixture baseline — not scientific ground
+          truth. Checked-in values; not rerun as a 15-call live benchmark
+          against the final model. Estimated live inference cost / evaluation:{" "}
+          {benchmarkSummary.estimatedCost}; actual cost varies by model and
+          token use.
         </p>
       </section>
       <Footer />
@@ -1476,27 +1475,37 @@ RUN ANOTHER IDEA
   );
 }
 
-function BenchmarkLedger({ cases }: { cases: typeof benchmarkCases }) {
+function BenchmarkTicket({
+  case: c,
+  index,
+  "aria-hidden": ariaHidden,
+}: {
+  case: (typeof benchmarkCases)[number];
+  index: number;
+  "aria-hidden"?: boolean;
+}) {
+  const miss = c.expected !== c.model;
   return (
-    <div className="benchmark-table">
-      <div className="table-row table-head">
-        <span>CASE</span>
-        <span>EXPECTED</span>
-        <span>MODEL</span>
-        <span>PRIMARY WEAKNESS</span>
-      </div>
-      {cases.map((benchmarkCase) => (
-        <div
-          className={`table-row ${benchmarkCase.expected !== benchmarkCase.model ? "miss" : ""}`}
-          key={benchmarkCase.name}
-        >
-          <b>{benchmarkCase.name}</b>
-          <span>{benchmarkCase.expected}</span>
-          <span>{benchmarkCase.model}</span>
-          <p>{benchmarkCase.weakness}</p>
+    <li aria-hidden={ariaHidden || undefined}>
+      <article className={`odds-ticket ${miss ? "miss" : "match"}`}>
+        <header>
+          <span className="odds-no">CASE {String(index + 1).padStart(2, "0")}</span>
+          <span className={`odds-flag ${miss ? "miss" : "match"}`}>
+            {miss ? "✕ MISS" : "✓ MATCH"}
+          </span>
+        </header>
+        <b className="odds-name">{c.name}</b>
+        <div className="odds-verdicts">
+          <span>
+            EXPECTED <b>{c.expected}</b>
+          </span>
+          <span>
+            PIVOT <b>{c.model}</b>
+          </span>
         </div>
-      ))}
-    </div>
+        <p className="odds-weakness">{c.weakness}</p>
+      </article>
+    </li>
   );
 }
 

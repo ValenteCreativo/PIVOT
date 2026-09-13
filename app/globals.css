@@ -675,6 +675,8 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   align-items: center;
   gap: 18px;
   margin-top: clamp(12px, 1.8vh, 22px);
+  /* leave room at the lower-right so the rose flash is never obscured */
+  margin-right: clamp(150px, 15vw, 220px);
 }
 .rail-lead {
   font-family: var(--font-cond);
@@ -780,8 +782,8 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
   border-top: 2px solid var(--ink);
 }
 /* each major section reads as a deliberate editorial chapter */
-.method { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: clamp(40px, 5vw, 70px); align-items: center; min-height: 78svh; align-content: center; }
-.benchmark { min-height: 84svh; display: flex; flex-direction: column; justify-content: center; }
+.method { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: clamp(40px, 5vw, 70px); align-items: center; min-height: 88svh; align-content: center; }
+.benchmark { min-height: 88svh; display: flex; flex-direction: column; justify-content: center; }
 .method h2, .benchmark h2, .infrastructure h2 {
   margin: 0;
   font-family: var(--font-serif);
@@ -819,39 +821,62 @@ textarea:focus-visible, select:focus-visible, summary:focus-visible {
 .metric-grid b { display: block; font-family: var(--font-serif); font-size: clamp(30px, 3.4vw, 44px); color: var(--oxblood); line-height: 1; }
 .metric-grid span { display: block; margin-top: 8px; font-family: var(--font-cond); font-weight: 700; font-size: 10px; letter-spacing: 0.1em; color: var(--ink-soft); }
 
-.benchmark-table { background: #ede0cd; border: 2px solid var(--ink); }
-.table-row {
-  display: grid; grid-template-columns: 1.3fr 0.8fr 0.8fr 1.6fr; align-items: center;
-  min-height: 52px; padding: 8px 16px; border-bottom: 1px solid #a99a83; font-size: 12px;
+/* --- benchmark odds rail: slow auto-scrolling bookmaker tickets (all 15) --- */
+.odds-rail {
+  position: relative;
+  margin-top: 30px;
+  overflow: hidden;
+  border-top: 1px solid #81786d;
+  border-bottom: 1px solid #81786d;
+  padding: 22px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
 }
-.table-row:last-child { border-bottom: 0; }
-.table-row b { font-family: var(--font-cond); font-weight: 700; font-size: 13px; }
-.table-row span { font-family: var(--font-cond); font-weight: 700; font-size: 11px; letter-spacing: 0.06em; color: var(--ink-soft); }
-.table-row p { margin: 0; color: var(--ink-faint); font-size: 12px; }
-.table-head { background: #e4d6c0; }
-.table-head span { color: var(--ink); }
-.table-row.miss { border-left: 5px solid var(--oxblood); background: #ead3c9; }
-.table-row.miss span:nth-child(3) { color: var(--oxblood); }
-
-.benchmark-disclosure { margin-top: 16px; }
-.benchmark-disclosure > summary {
-  display: flex; align-items: center; justify-content: space-between;
-  min-height: 50px; padding: 0 16px; cursor: pointer; list-style: none;
-  border-top: 1px solid #81786d; border-bottom: 1px solid #81786d;
-  font-family: var(--font-cond); font-weight: 700; font-size: 11px; letter-spacing: 0.1em; color: var(--ink);
+.odds-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* slower + more contemplative than the demo rail */
+  animation: rail-scroll 160s linear infinite;
 }
-.benchmark-disclosure > summary::-webkit-details-marker { display: none; }
-.benchmark-disclosure > summary span { color: var(--oxblood); font-size: 16px; transition: transform 0.2s; }
-.benchmark-disclosure[open] > summary span { transform: rotate(180deg); }
-.benchmark-disclosure .benchmark-table { margin-top: 12px; }
-.cost-note { margin-top: 16px; font-family: var(--font-mono); font-size: 10px; line-height: 1.5; color: var(--ink-faint); }
+.odds-track > li { flex: 0 0 auto; }
+.odds-rail:hover .odds-track,
+.odds-rail:focus-within .odds-track { animation-play-state: paused; }
+.odds-ticket {
+  width: 230px;
+  min-height: 150px;
+  padding: 14px 16px;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  background: #f7edda;
+  box-shadow: var(--ink-shadow-sm);
+}
+.odds-ticket.miss { border-left: 6px solid var(--oxblood); }
+.odds-ticket.match { border-left: 6px solid var(--green); }
+.odds-ticket > header { display: flex; align-items: center; justify-content: space-between; }
+.odds-no { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--ink-faint); }
+.odds-flag { font-family: var(--font-cond); font-weight: 700; font-size: 10px; letter-spacing: 0.06em; }
+.odds-flag.match { color: var(--green); }
+.odds-flag.miss { color: var(--oxblood); }
+.odds-name {
+  display: block; margin: 12px 0 14px;
+  font-family: var(--font-serif); font-size: 20px; line-height: 1.02; letter-spacing: -0.01em; color: var(--ink);
+}
+.odds-verdicts { display: grid; gap: 4px; padding-top: 10px; border-top: 1px dashed #9a8f7d; }
+.odds-verdicts span { display: flex; justify-content: space-between; font-family: var(--font-cond); font-weight: 700; font-size: 10px; letter-spacing: 0.06em; color: var(--ink-soft); }
+.odds-verdicts b { color: var(--ink); }
+.odds-weakness { margin: 12px 0 0; font-size: 11.5px; line-height: 1.4; color: var(--ink-soft); }
+.cost-note { margin-top: 18px; font-family: var(--font-mono); font-size: 10px; line-height: 1.5; color: var(--ink-faint); }
 
 .infrastructure {
   max-width: 1440px; margin: 0 auto;
   padding: clamp(56px, 7vw, 96px) clamp(20px, 4vw, 58px);
   border-top: 2px solid var(--ink);
   display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(40px, 5vw, 60px);
-  min-height: 72svh; align-content: center;
+  min-height: 82svh; align-content: center;
 }
 .infrastructure-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid var(--ink); background: var(--paper-panel); box-shadow: var(--ink-shadow); }
 .infrastructure-grid article { padding: 24px; border-right: 1px solid var(--ink); }
@@ -1150,39 +1175,46 @@ footer > span { font-family: var(--font-cond); font-weight: 700; font-size: 9px;
 /* laptop heights: tighten the poster so the whole hero fits one viewport.
    1440x900 lands here; 1366x768 hits the tighter tier below. */
 @media (min-width: 1081px) and (max-height: 940px) {
-  .topbar { min-height: 52px; }
-  .hero.poster { padding-top: 12px; padding-bottom: 18px; }
-  .poster-headline h1 { font-size: clamp(44px, 5vw, 72px); }
-  .headline-sub { margin-top: 7px; }
-  .poster-grid { margin-top: 10px; gap: clamp(14px, 1.8vw, 32px); }
-  .machine-cap { min-height: 46px; }
-  .machine-reels { padding-top: 10px; padding-bottom: 10px; }
-  .reel-window { height: clamp(66px, 5.6vw, 82px); }
+  .topbar { min-height: 50px; }
+  .hero.poster { padding-top: 10px; padding-bottom: 14px; }
+  .poster-headline h1 { font-size: clamp(42px, 4.6vw, 66px); }
+  .headline-sub { margin-top: 6px; }
+  .poster-grid { margin-top: 8px; gap: clamp(14px, 1.8vw, 30px); }
+  .machine-stage { max-width: 600px; }
+  .machine-cap { min-height: 44px; }
+  .machine-cap b { font-size: clamp(22px, 2.4vw, 32px); }
+  .machine-reels { padding-top: 9px; padding-bottom: 9px; gap: 10px; }
+  .reel-window { height: clamp(58px, 7.2vh, 78px); }
+  .reel-glyph { width: clamp(28px, 3.2vw, 40px); height: clamp(28px, 3.2vw, 40px); }
   .machine-motto { padding-top: 4px; padding-bottom: 4px; }
-  .machine-deck { padding-top: 9px; padding-bottom: 12px; }
-  .intake-machine textarea { min-height: 42px; }
-  .run-button { min-height: 46px; margin-top: 9px; }
-  .poster-rail { margin-top: 12px; }
+  .machine-deck { padding-top: 8px; padding-bottom: 11px; }
+  .deck-lead { margin-bottom: 4px; }
+  .intake-machine textarea { min-height: 40px; }
+  .deck-controls { margin-top: 7px; }
+  .more-constraints { margin-top: 7px; }
+  .run-button { min-height: 44px; margin-top: 8px; }
+  .ticket-slot { display: none; }
+  .poster-rail { margin-top: 10px; }
 }
 
 @media (min-width: 1081px) and (max-height: 800px) {
-  .topbar { min-height: 48px; }
-  .hero.poster { padding-top: 9px; padding-bottom: 14px; }
-  .poster-headline h1 { font-size: clamp(40px, 4.6vw, 64px); }
+  .topbar { min-height: 46px; }
+  .hero.poster { padding-top: 8px; padding-bottom: 12px; }
+  .poster-headline h1 { font-size: clamp(38px, 4.2vw, 58px); }
   .headline-star { display: none; }
-  .headline-sub { margin-top: 6px; font-size: 13px; }
-  .poster-grid { margin-top: 8px; }
-  .machine-stage { max-width: 600px; }
-  .machine-cap { min-height: 42px; }
-  .machine-cap b { font-size: clamp(22px, 2.3vw, 30px); }
-  .reel-window { height: clamp(60px, 5vw, 74px); }
-  .reel-glyph { width: clamp(28px, 3vw, 38px); height: clamp(28px, 3vw, 38px); }
-  .machine-deck { padding-top: 8px; padding-bottom: 10px; }
-  .intake-machine textarea { min-height: 38px; }
-  .deck-controls { margin-top: 7px; }
-  .run-button { min-height: 44px; margin-top: 8px; }
-  .ticket-slot { margin-top: 7px; }
-  .poster-rail { margin-top: 10px; }
+  .headline-sub { margin-top: 5px; font-size: 13px; }
+  .poster-grid { margin-top: 6px; }
+  .machine-stage { max-width: 560px; }
+  .machine-cap { min-height: 40px; }
+  .machine-cap b { font-size: clamp(20px, 2.1vw, 28px); }
+  .reel-window { height: clamp(52px, 6.4vh, 68px); }
+  .reel-glyph { width: clamp(26px, 2.8vw, 36px); height: clamp(26px, 2.8vw, 36px); }
+  .machine-motto { padding-top: 3px; padding-bottom: 3px; font-size: 9px; }
+  .machine-deck { padding-top: 7px; padding-bottom: 9px; }
+  .intake-machine textarea { min-height: 36px; }
+  .deck-controls { margin-top: 6px; }
+  .run-button { min-height: 42px; margin-top: 7px; }
+  .poster-rail { margin-top: 8px; }
 }
 
 @media (max-width: 1080px) {
@@ -1192,7 +1224,7 @@ footer > span { font-family: var(--font-cond); font-weight: 700; font-size: 9px;
   .poster-left, .poster-right { max-width: 620px; margin: 0 auto; width: 100%; }
   /* mobile/tablet order: machine -> demo rail -> methodology -> credibility */
   .machine-stage { order: 2; width: 100%; max-width: 720px; margin: 30px auto 0; }
-  .poster-rail { order: 3; }
+  .poster-rail { order: 3; margin-right: 0; }
   .poster-right { order: 4; margin-top: 30px; }
   .poster-left { order: 5; margin-top: 30px; }
   .editorial-head { text-align: center; }
@@ -1202,9 +1234,11 @@ footer > span { font-family: var(--font-cond); font-weight: 700; font-size: 9px;
   .margin-script { display: none; }
   .process-column { grid-template-columns: 1fr; }
   .poster-flash { display: none; }
-  .method { grid-template-columns: 1fr; gap: 30px; }
+  /* below 1080 let content set section height rather than svh floors */
+  .method { grid-template-columns: 1fr; gap: 30px; min-height: 0; }
+  .benchmark { min-height: 0; }
   .benchmark-head { grid-template-columns: 1fr; }
-  .infrastructure { grid-template-columns: 1fr; }
+  .infrastructure { grid-template-columns: 1fr; min-height: 0; }
   .process-layout { grid-template-columns: 1fr; }
   .process-machine { max-width: 700px; }
   .report-body { grid-template-columns: 1fr; }
@@ -1269,9 +1303,11 @@ footer > span { font-family: var(--font-cond); font-weight: 700; font-size: 9px;
 
   .method, .benchmark, .infrastructure { padding: 56px 16px; }
   .metric-grid { grid-template-columns: 1fr 1fr; }
-  .table-row { grid-template-columns: 1.2fr 0.8fr 0.8fr; }
-  .table-row p { grid-column: 1 / -1; margin-top: 6px; }
-  .table-head span:last-child { display: none; }
+  .odds-rail { overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; -webkit-mask-image: none; mask-image: none; }
+  .odds-rail::-webkit-scrollbar { display: none; }
+  .odds-track { animation: none; }
+  .odds-track > li[aria-hidden="true"] { display: none; }
+  .odds-ticket { scroll-snap-align: start; width: 210px; }
   .verdict-grid { grid-template-columns: 1fr; }
   .score-dial { min-height: 160px; }
   .score-dial b { font-size: 64px; }
@@ -1302,8 +1338,8 @@ footer > span { font-family: var(--font-cond); font-weight: 700; font-size: 9px;
   .lever-arm, .lever-handle { transition: none !important; }
   .mentor-receipt { animation: none; }
   .run-button, .try-demo, .open-report, .demo-ticket { transition: none; }
-  /* rail: stop the marquee, allow manual horizontal scroll instead */
-  .rail-track { animation: none !important; }
-  .rail-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
-  .rail-track > li[aria-hidden="true"] { display: none; }
+  /* rails: stop the marquee, allow manual horizontal scroll instead */
+  .rail-track, .odds-track { animation: none !important; }
+  .rail-marquee, .odds-rail { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .rail-track > li[aria-hidden="true"], .odds-track > li[aria-hidden="true"] { display: none; }
 }
