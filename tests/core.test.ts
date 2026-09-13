@@ -6,6 +6,7 @@ import type { MentorReport, ResearchRound } from '@/lib/types';
 import { detectMode } from '@/providers/mode';
 import { DemoResearchProvider } from '@/providers/research/demo';
 import { LinkupResearchProvider } from '@/providers/research/linkup';
+import { canonicalizeEventUrl, classifyEvidence, humanizeSlug } from '@/lib/event-url';
 import { IdempotencyCache, withRetry } from '@/workflows/retry';
 import { CHILD_TASK_RETRY, INFERENCE_TASK_RETRY, ORCHESTRATOR_RETRY } from '@/workflows/retry-policy';
 import { NebiusInferenceProvider } from '@/providers/inference/nebius';
@@ -153,5 +154,100 @@ describe('workflow routing',()=>{
   });
   it('keeps workflow numbering within its total and derives stable report IDs',async()=>{
     expect(workflowOrdinal(0,9)).toBe(1);expect(workflowOrdinal(9,9)).toBe(9);expect(workflowOrdinal(10,9)).toBe(9);expect(await analysisIdFor('same-key')).toBe(await analysisIdFor('same-key'));
+  });
+});
+
+describe('target-event resolution',()=>{
+  afterEach(()=>vi.restoreAllMocks());
+
+  it('canonicalizes an event URL into host, slug, path and label',()=>{
+    const id=canonicalizeEventUrl('https://ethglobal.com/events/ethonline2026');
+    expect(id).toMatchObject({host:'ethglobal.com',collection:'/events',slug:'ethonline2026',eventPath:'/events/ethonline2026',baseEventUrl:'https://ethglobal.com/events/ethonline2026'});
+    expect(id?.label).toBe('ETHOnline 2026');
+    expect(canonicalizeEventUrl('https://www.ethglobal.com/events/ETHOnline2026/prizes')?.slug).toBe('ethonline2026');
+    expect(canonicalizeEventUrl('')).toBeNull();
+    expect(canonicalizeEventUrl('not a url')).toBeNull();
+    // Organizer root with no specific event resolves host but no slug.
+    expect(canonicalizeEventUrl('https://ethglobal.com/')).toMatchObject({host:'ethglobal.com',slug:'',eventPath:''});
+  });
+
+  it('humanizes ETH-style slugs',()=>{
+    expect(humanizeSlug('ethonline2026')).toBe('ETHOnline 2026');
+    expect(humanizeSlug('eth-denver-2025')).toBe('ETH Denver 2025');
+  });
+
+  it('classifies same-organizer other-event pages as OTHER_EVENT, not target-event first-party',()=>{
+    const id=canonicalizeEventUrl('https://ethglobal.com/events/ethonline2026')!;
+    expect(classifyEvidence('https://ethglobal.com/events/ethonline2026/prizes',id)).toBe('TARGET_EVENT_FIRST_PARTY');
+    expect(classifyEvidence('https://ethglobal.com/events/ethdenver2025/prizes',id)).toBe('OTHER_EVENT');
+    expect(classifyEvidence('https://ethglobal.com/about',id)).toBe('ORGANIZER_GENERAL');
+    expect(classifyEvidence('https://someblog.dev/ethonline-recap',id)).toBe('THIRD_PARTY_RELEVANT');
+  });
+
+  // Blue Router / ETHOnline 2026 regression: PIVOT must not treat another
+  // ETHGlobal event as evidence for the target event's sponsors.
+  it('does not let other ETHGlobal events verify target-event sponsors, and anchors queries to the event slug',async()=>{
+    const fetchMock=vi.spyOn(globalThis,'fetch')
+      // event query -> a page from a DIFFERENT ETHGlobal event
+      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'ETHDenver 2025 prizes',url:'https://ethglobal.com/events/ethdenver2025/prizes',content:'ETHDenver sponsors: Polygon, Chainlink. Tracks and prizes.'}]}),{status:200,headers:{'Content-Type':'application/json'}}))
+      // dedicated first-party sponsor query -> the actual target event page
+      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'ETHOnline 2026 prizes',url:'https://ethglobal.com/events/ethonline2026/prizes',content:'ETHOnline 2026 sponsors: Hedera, ENS, Bazantic. Prize tracks and judging.'}]}),{status:200,headers:{'Content-Type':'application/json'}}))
+      // landscape query
+      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'Onchain reputation landscape',url:'https://research.example/reputation',content:'Competitors and adoption evidence.'}]}),{status:200,headers:{'Content-Type':'application/json'}}));
+    const provider=new LinkupResearchProvider('secret');
+    const input={hackathonUrl:'https://ethglobal.com/events/ethonline2026',idea:'Blue Router: an onchain reputation router using Hedera, ENS and Bazantic.'};
+    const round=await provider.researchHackathon(input);
+
+    const queries=fetchMock.mock.calls.map(call=>JSON.parse(String(call[1]?.body)).q as string);
+    // queries are scoped to the specific event path, not just the host.
+    expect(queries[0]).toContain('site:ethglobal.com/events/ethonline2026');
+    expect(queries[1]).toContain('site:ethglobal.com/events/ethonline2026');
+    expect(queries[1]).toMatch(/prizes|sponsors/);
+
+    const other=round.findings.find(f=>f.url.includes('ethdenver2025'))!;
+    const target=round.findings.find(f=>f.url.includes('ethonline2026'))!;
+    // A different event by the same organizer is NOT first-party evidence.
+    expect(other.relationship).toBe('Other event by the same organizer');
+    expect(other.relationship).not.toContain('first-party');
+    // C: the target-event page is first-party and can carry sponsor facts.
+    expect(target.relationship).toBe('Target event · first-party');
+    expect(target.summary).toContain('Hedera');
+  });
+
+  // B: when the target event's own page confirms sponsors, the deterministic
+  // sponsor-fit gate keeps them (they are not labeled unverified).
+  it('keeps sponsors that appear in target-event first-party evidence',()=>{
+    const research:ResearchRound[]=[{round:1,focus:'Target event resolution + idea landscape',queries:['q'],gaps:[],findings:[{id:'r1-0-x',title:'ETHOnline 2026 prizes',url:'https://ethglobal.com/events/ethonline2026/prizes',retrievedAt:'2026-09-10T00:00:00.000Z',query:'q',summary:'ETHOnline 2026 sponsors: Hedera, ENS and Bazantic with prize tracks.',claimSupported:'First-party evidence from the target event page',confidence:92,relationship:'Target event · first-party',demo:false}]}];
+    const a=assessment({sponsorFit:[
+      {name:'Hedera',fit:'NATURAL',reason:'Native to the onchain reputation flow.'},
+      {name:'ENS',fit:'POSSIBLE',reason:'Identity naming fits reputation.'},
+    ]});
+    const report=buildLiveMentorReport({idea:'Blue Router onchain reputation',hackathonUrl:'https://ethglobal.com/events/ethonline2026'},research,a,'report-sponsors');
+    const names=report.sponsorFit.map(s=>s.name);
+    expect(names).toContain('Hedera');
+    expect(names).toContain('ENS');
+    expect(report.sponsorFit.some(s=>s.fit==='UNKNOWN')).toBe(false);
+  });
+
+  // D: if target-event evidence cannot be retrieved, the verify gap is raised
+  // (which drives an honest UNKNOWN downstream) rather than assuming sponsors.
+  it('returns an unresolved-target-event gap when only other-event pages are found',async()=>{
+    const fetchMock=vi.spyOn(globalThis,'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'ETHDenver 2025',url:'https://ethglobal.com/events/ethdenver2025/prizes',content:'Sponsors and prizes for a different event.'}]}),{status:200,headers:{'Content-Type':'application/json'}}))
+      .mockResolvedValueOnce(new Response(JSON.stringify({results:[]}),{status:200,headers:{'Content-Type':'application/json'}}))
+      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'Landscape',url:'https://research.example/x',content:'Competitor and adoption evidence.'}]}),{status:200,headers:{'Content-Type':'application/json'}}));
+    const provider=new LinkupResearchProvider('secret');
+    const input={hackathonUrl:'https://ethglobal.com/events/ethonline2026',idea:'Blue Router onchain reputation'};
+    const round=await provider.researchHackathon(input);
+    const gaps=await provider.identifyEvidenceGaps(round,input);
+    expect(round.findings.some(f=>f.relationship==='Target event · first-party')).toBe(false);
+    expect(gaps.some(g=>/other events by the same organizer do not confirm/i.test(g))).toBe(true);
+    fetchMock.mockRestore();
+
+    // The deterministic sponsor gate falls back to UNKNOWN when no first-party
+    // (non-demo) evidence names the sponsors.
+    const a=assessment({sponsorFit:[{name:'Hedera',fit:'NATURAL',reason:'x'}]});
+    const report=buildLiveMentorReport(input,[round],a,'report-unknown');
+    expect(report.sponsorFit.every(s=>s.fit==='UNKNOWN')).toBe(true);
   });
 });
