@@ -230,6 +230,12 @@ describe('target-event resolution',()=>{
     expect(report.sponsorFit.some(s=>s.fit==='UNKNOWN')).toBe(false);
   });
 
+  it('keeps a compound sponsor recommendation when every name is in target-event evidence',()=>{
+    const research:ResearchRound[]=[{round:1,focus:'Target event resolution',queries:['FETCH target/prizes'],gaps:[],findings:[{id:'r1-prizes',title:'ETHOnline 2026 prizes',url:'https://ethglobal.com/events/ethonline2026/prizes',retrievedAt:'2026-09-13T00:00:00.000Z',query:'Direct target-event fetch',summary:'Official sponsors and prize tracks include Hedera, ENS, and Bazantic.',claimSupported:'Directly fetched first-party evidence from the target event',confidence:96,relationship:'Target event · first-party',demo:false}]}];
+    const report=buildLiveMentorReport({idea:'Blue Router onchain reputation'},research,assessment({sponsorFit:[{name:'Hedera / ENS / Bazantic',fit:'NATURAL',reason:'All three are load-bearing integrations.'}]}),'report-compound-sponsors');
+    expect(report.sponsorFit).toEqual([{name:'Hedera / ENS / Bazantic',fit:'NATURAL',reason:'All three are load-bearing integrations.'}]);
+  });
+
   it('keeps target-event facts UNKNOWN when direct pages and official search are unavailable',async()=>{
     vi.spyOn(console,'warn').mockImplementation(()=>undefined);
     vi.spyOn(globalThis,'fetch').mockImplementation(async(url,init)=>{
