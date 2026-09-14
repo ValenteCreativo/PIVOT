@@ -109,17 +109,17 @@ describe('providers and schemas',()=>{
   });
   it('derives follow-up queries from Round 1 gaps',async()=>{const p=new DemoResearchProvider();const input={idea:'AI climate app'};const one=await p.researchHackathon(input);const gaps=await p.identifyEvidenceGaps(one,input);const two=await p.followUpSearch(gaps,input);expect(two.queries[0]).toContain(gaps[0]);expect(two.round).toBe(2)});
   it('separates target-event retrieval from idea-landscape retrieval and marks first-party evidence',async()=>{
-    const fetchMock=vi.spyOn(globalThis,'fetch')
-      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'Official rules',url:'https://burning-token.example/rules',content:'Tracks, sponsors, judging criteria, prizes and deadline.'}]}),{status:200,headers:{'Content-Type':'application/json'}}))
-      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'Focus-room alternatives',url:'https://products.example/focus',content:'Competitor and adoption evidence for multiplayer focus rooms.'}]}),{status:200,headers:{'Content-Type':'application/json'}}));
+    const fetchMock=vi.spyOn(globalThis,'fetch').mockImplementation(async(url)=>String(url).endsWith('/fetch')
+      ?new Response(JSON.stringify({markdown:'# Burning Token\nTracks, sponsors, judging criteria, prizes, rules and deadline.'}),{status:200})
+      :new Response(JSON.stringify({results:[{name:'Focus-room alternatives',url:'https://products.example/focus',content:'Competitor and adoption evidence for multiplayer focus rooms.'}]}),{status:200}));
     const provider=new LinkupResearchProvider('secret');const input={hackathonUrl:'https://burning-token.example/',idea:'A multiplayer focus room for remote product teams'};const round=await provider.researchHackathon(input);
-    const queries=fetchMock.mock.calls.map(call=>JSON.parse(String(call[1]?.body)).q as string);
-    expect(queries).toHaveLength(2);expect(queries[0]).toContain('site:burning-token.example');expect(queries[0]).not.toContain(input.idea);expect(queries[1]).toContain(input.idea);expect(queries[1]).not.toContain(input.hackathonUrl);
-    expect(round.findings[0]).toMatchObject({confidence:92,relationship:'Target event · first-party'});expect(round.findings[1].relationship).toBe('Idea landscape');
+    const calls=fetchMock.mock.calls.map(call=>({endpoint:String(call[0]),body:JSON.parse(String(call[1]?.body))}));
+    expect(calls).toHaveLength(2);expect(calls[0]).toMatchObject({endpoint:'https://api.linkup.so/v1/fetch',body:{url:input.hackathonUrl,renderJs:true}});expect(calls[1].body.q).toContain(input.idea);
+    expect(round.findings[0]).toMatchObject({confidence:96,relationship:'Target event · first-party'});expect(round.findings[1].relationship).toBe('Idea landscape');
     const gaps=await provider.identifyEvidenceGaps(round,input);expect(gaps.some(gap=>gap.includes('Verify the supplied hackathon'))).toBe(false);
     fetchMock.mockImplementation(async()=>new Response(JSON.stringify({results:[]}),{status:200,headers:{'Content-Type':'application/json'}}));const followUp=await provider.followUpSearch(gaps,input);
     expect(followUp.queries[0]).toContain(gaps[0]);expect(JSON.parse(String(fetchMock.mock.calls[2][1]?.body)).q).toContain(gaps[0]);
-    const eventFollowUp=await provider.followUpSearch(['Verify the target hackathon tracks and judging criteria'],input);expect(eventFollowUp.queries[0]).toBe('site:burning-token.example Verify the target hackathon tracks and judging criteria');expect(eventFollowUp.queries[0]).not.toContain(input.idea);
+    const eventFollowUp=await provider.followUpSearch(['Verify the target hackathon tracks and judging criteria'],input);expect(eventFollowUp.queries[0]).toContain('Verify the target hackathon tracks and judging criteria');expect(eventFollowUp.queries[0]).not.toContain(input.idea);expect(JSON.parse(String(fetchMock.mock.calls.at(-1)?.[1]?.body)).includeDomains).toEqual(['burning-token.example']);
   });
 });
 
@@ -184,34 +184,35 @@ describe('target-event resolution',()=>{
     expect(classifyEvidence('https://someblog.dev/ethonline-recap',id)).toBe('THIRD_PARTY_RELEVANT');
   });
 
-  // Blue Router / ETHOnline 2026 regression: PIVOT must not treat another
-  // ETHGlobal event as evidence for the target event's sponsors.
-  it('does not let other ETHGlobal events verify target-event sponsors, and anchors queries to the event slug',async()=>{
-    const fetchMock=vi.spyOn(globalThis,'fetch')
-      // event query -> a page from a DIFFERENT ETHGlobal event
-      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'ETHDenver 2025 prizes',url:'https://ethglobal.com/events/ethdenver2025/prizes',content:'ETHDenver sponsors: Polygon, Chainlink. Tracks and prizes.'}]}),{status:200,headers:{'Content-Type':'application/json'}}))
-      // dedicated first-party sponsor query -> the actual target event page
-      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'ETHOnline 2026 prizes',url:'https://ethglobal.com/events/ethonline2026/prizes',content:'ETHOnline 2026 sponsors: Hedera, ENS, Bazantic. Prize tracks and judging.'}]}),{status:200,headers:{'Content-Type':'application/json'}}))
-      // landscape query
-      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'Onchain reputation landscape',url:'https://research.example/reputation',content:'Competitors and adoption evidence.'}]}),{status:200,headers:{'Content-Type':'application/json'}}));
-    const provider=new LinkupResearchProvider('secret');
+  it('fetches a prize page discovered on the exact target URL before any search',async()=>{
+    const fetchMock=vi.spyOn(globalThis,'fetch').mockImplementation(async(url,init)=>{
+      const body=JSON.parse(String(init?.body));
+      if(String(url).endsWith('/fetch')&&body.url.endsWith('/ethonline2026'))return new Response(JSON.stringify({markdown:'# ETHOnline 2026\n[Prizes](/events/ethonline2026/prizes)'}),{status:200});
+      if(String(url).endsWith('/fetch'))return new Response(JSON.stringify({markdown:'# ETHOnline 2026 Prizes\nSponsors Hedera and ENS. Prize tracks, judging criteria, rules, submission deadline.'}),{status:200});
+      return new Response(JSON.stringify({results:[{name:'Landscape',url:'https://research.example/reputation',content:'Competitors and adoption evidence.'}]}),{status:200});
+    });
     const input={hackathonUrl:'https://ethglobal.com/events/ethonline2026',idea:'Blue Router: an onchain reputation router using Hedera, ENS and Bazantic.'};
-    const round=await provider.researchHackathon(input);
+    const round=await new LinkupResearchProvider('secret').researchHackathon(input);
+    const calls=fetchMock.mock.calls.map(call=>({endpoint:String(call[0]),body:JSON.parse(String(call[1]?.body))}));
+    expect(calls[0].body.url).toBe(input.hackathonUrl);expect(calls[1].body.url).toBe('https://ethglobal.com/events/ethonline2026/prizes');expect(calls.slice(0,2).every(call=>call.endpoint.endsWith('/fetch'))).toBe(true);
+    expect(round.findings.find(f=>f.url.endsWith('/prizes'))).toMatchObject({relationship:'Target event · first-party',summary:expect.stringContaining('Hedera')});
+  });
 
-    const queries=fetchMock.mock.calls.map(call=>JSON.parse(String(call[1]?.body)).q as string);
-    // queries are scoped to the specific event path, not just the host.
-    expect(queries[0]).toContain('site:ethglobal.com/events/ethonline2026');
-    expect(queries[1]).toContain('site:ethglobal.com/events/ethonline2026');
-    expect(queries[1]).toMatch(/prizes|sponsors/);
-
-    const other=round.findings.find(f=>f.url.includes('ethdenver2025'))!;
-    const target=round.findings.find(f=>f.url.includes('ethonline2026'))!;
-    // A different event by the same organizer is NOT first-party evidence.
-    expect(other.relationship).toBe('Other event by the same organizer');
-    expect(other.relationship).not.toContain('first-party');
-    // C: the target-event page is first-party and can carry sponsor facts.
-    expect(target.relationship).toBe('Target event · first-party');
-    expect(target.summary).toContain('Hedera');
+  it('rejects another event even when Linkup returns it from the official domain search',async()=>{
+    vi.spyOn(console,'warn').mockImplementation(()=>undefined);
+    const fetchMock=vi.spyOn(globalThis,'fetch').mockImplementation(async(url,init)=>{
+      const body=JSON.parse(String(init?.body));
+      if(String(url).endsWith('/fetch'))return new Response('',{status:404});
+      if(body.includeDomains)return new Response(JSON.stringify({results:[
+        {name:'ETHDenver prizes',url:'https://ethglobal.com/events/ethdenver2025/prizes',content:'Polygon sponsor prizes.'},
+        {name:'ETHOnline prizes',url:'https://ethglobal.com/events/ethonline2026/prizes',content:'Hedera and ENS sponsors, prize tracks, judging and rules.'},
+      ]}),{status:200});
+      return new Response(JSON.stringify({results:[{name:'Landscape',url:'https://research.example/reputation',content:'Competitors and adoption evidence.'}]}),{status:200});
+    });
+    const input={hackathonUrl:'https://ethglobal.com/events/ethonline2026',idea:'Blue Router onchain reputation'};
+    const round=await new LinkupResearchProvider('secret').researchHackathon(input);
+    expect(round.findings.some(f=>f.url.includes('ethdenver2025'))).toBe(false);expect(round.findings.find(f=>f.url.includes('ethonline2026/prizes'))?.summary).toContain('Hedera');
+    const eventSearch=fetchMock.mock.calls.map(call=>JSON.parse(String(call[1]?.body))).find(body=>body.includeDomains);expect(eventSearch.includeDomains).toEqual(['ethglobal.com']);
   });
 
   // B: when the target event's own page confirms sponsors, the deterministic
@@ -229,23 +230,20 @@ describe('target-event resolution',()=>{
     expect(report.sponsorFit.some(s=>s.fit==='UNKNOWN')).toBe(false);
   });
 
-  // D: if target-event evidence cannot be retrieved, the verify gap is raised
-  // (which drives an honest UNKNOWN downstream) rather than assuming sponsors.
-  it('returns an unresolved-target-event gap when only other-event pages are found',async()=>{
-    const fetchMock=vi.spyOn(globalThis,'fetch')
-      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'ETHDenver 2025',url:'https://ethglobal.com/events/ethdenver2025/prizes',content:'Sponsors and prizes for a different event.'}]}),{status:200,headers:{'Content-Type':'application/json'}}))
-      .mockResolvedValueOnce(new Response(JSON.stringify({results:[]}),{status:200,headers:{'Content-Type':'application/json'}}))
-      .mockResolvedValueOnce(new Response(JSON.stringify({results:[{name:'Landscape',url:'https://research.example/x',content:'Competitor and adoption evidence.'}]}),{status:200,headers:{'Content-Type':'application/json'}}));
+  it('keeps target-event facts UNKNOWN when direct pages and official search are unavailable',async()=>{
+    vi.spyOn(console,'warn').mockImplementation(()=>undefined);
+    vi.spyOn(globalThis,'fetch').mockImplementation(async(url,init)=>{
+      const body=JSON.parse(String(init?.body));
+      if(String(url).endsWith('/fetch'))return new Response('',{status:404});
+      if(body.includeDomains)return new Response(JSON.stringify({results:[{name:'ETHDenver 2025',url:'https://ethglobal.com/events/ethdenver2025/prizes',content:'Sponsors and prizes for a different event.'}]}),{status:200});
+      return new Response(JSON.stringify({results:[{name:'Landscape',url:'https://research.example/x',content:'Competitor and adoption evidence.'}]}),{status:200});
+    });
     const provider=new LinkupResearchProvider('secret');
     const input={hackathonUrl:'https://ethglobal.com/events/ethonline2026',idea:'Blue Router onchain reputation'};
     const round=await provider.researchHackathon(input);
     const gaps=await provider.identifyEvidenceGaps(round,input);
     expect(round.findings.some(f=>f.relationship==='Target event · first-party')).toBe(false);
-    expect(gaps.some(g=>/other events by the same organizer do not confirm/i.test(g))).toBe(true);
-    fetchMock.mockRestore();
-
-    // The deterministic sponsor gate falls back to UNKNOWN when no first-party
-    // (non-demo) evidence names the sponsors.
+    expect(round.findings.some(f=>f.url.includes('ethdenver2025'))).toBe(false);expect(gaps.some(g=>/first-party sources/i.test(g))).toBe(true);
     const a=assessment({sponsorFit:[{name:'Hedera',fit:'NATURAL',reason:'x'}]});
     const report=buildLiveMentorReport(input,[round],a,'report-unknown');
     expect(report.sponsorFit.every(s=>s.fit==='UNKNOWN')).toBe(true);
