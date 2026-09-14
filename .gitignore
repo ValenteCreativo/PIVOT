@@ -38,3 +38,31 @@ next-env.d.ts
 /outputs/
 /work/
 *.tsbuildinfo
+
+# local AI-agent instructions and workspace state
+/AGENTS.md
+/CLAUDE.md
+/.codex/
+/.kiro/
+/.openai/*
+!/.openai/hosting.json
+
+# editor and scratch files
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+*.tmp
+*.log
+/cache/
+/.cache/
+/tmp/
+
+# local databases
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*

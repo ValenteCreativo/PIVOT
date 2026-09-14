@@ -22,10 +22,10 @@ Let the reels stop, reveal the verdict window, and let the mentor receipt print.
 Show PIVOT evaluating itself against the real Burning Token event. “This is not idea-to-prompt scoring. The event, idea, and constraints enter a real background workflow.”
 
 **17–30s — Research before judgment**
-Pull the lever (or use the accessible **Run the Odds** control). “Render orchestrates the child tasks. Linkup first checks the supplied event domain and separately researches competitors, precedent, users, and adoption. PIVOT saves Round 1, identifies what is still unknown, and turns those gaps into Round 2.”
+Pull the lever (or use the accessible **Run the Odds** control). “Render orchestrates the child tasks. Linkup first checks the supplied event domain and separately researches competitors, precedent, users, and adoption. PIVOT carries Round 1 forward, identifies what is still unknown, and turns those gaps into Round 2.”
 
 **30–43s — Honest waiting and reliability**
-Point to the remote timer and status disclosure. “The moving marker is explicitly anticipation—we do not fake child-task completion. Transient provider faults retry at the smallest boundary, successful research is preserved, and the idempotency key prevents duplicate reports.”
+Point to the remote timer and status disclosure. “The moving marker is explicitly anticipation—we do not fake child-task completion. Transient provider faults retry at the smallest boundary, successful research is preserved, and the idempotency key deduplicates requests within the web process.”
 
 **43–54s — Evaluation**
 Show the reels landing, the verdict window opening, and the printed mentor receipt. “Nebius produces a strict ten-dimension assessment. Application code independently calculates Hackathon Edge, Real-World Edge, the total score, verdict, and near miss.”
@@ -45,7 +45,7 @@ Open the full report and show What Works, What Breaks, the pivot, Must Build, an
 Enter PIVOT as the target project and the Burning Token event URL. Mention the team constraints, then pull the lever. The keyboard-accessible button remains visible inside the machine.
 
 **32–47s — Sponsor architecture**
-“Render runs the real multi-step workflow. Linkup checks first-party event evidence separately from the project landscape, saves the findings, identifies evidence gaps, and runs targeted follow-up searches. Nebius receives that complete trail and returns a schema-constrained mentor assessment.”
+“Render runs the real multi-step workflow. Linkup checks first-party event evidence separately from the project landscape, carries the findings forward, identifies evidence gaps, and runs targeted follow-up searches. Nebius receives that complete trail and returns a schema-constrained mentor assessment.”
 
 **47–58s — Wait state**
 “A real run takes roughly 30–60 seconds. This timer is real elapsed time; the moving phase marker is labeled anticipation because the browser does not receive child-task events. We show confirmed status only when Render returns it.”

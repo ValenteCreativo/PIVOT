@@ -6,13 +6,13 @@ PIVOT! is an AI hackathon mentor that researches before it judges. It verifies t
 
 The problem is not a lack of ideas. It is spending a scarce hackathon weekend on an idea that is vague, undifferentiated, impossible to demonstrate, or padded with decorative sponsor integrations.
 
-**[Open the hosted Demo Mode](https://pivot-idea-casino.valecreativo.chatgpt.site/)** · [Architecture](#architecture) · [Sponsor integrations](#sponsor-integrations) · [Demo scripts](docs/DEMO-SCRIPT.md)
+**[Open PIVOT!](https://pivot-one-tau.vercel.app/)** · [Demo video](https://youtu.be/U8au5fupaL4) · [Architecture](#architecture) · [Sponsor integrations](#sponsor-integrations) · [Demo scripts](docs/DEMO-SCRIPT.md)
 
 ## How it works
 
 1. Read the supplied event from its own domain and collect tracks, sponsors, judging criteria, prizes, rules, and deadlines.
 2. Research competitors, technical precedent, user evidence, and adoption separately so the event query is not diluted by the project pitch.
-3. Save Round 1, identify material unknowns, and make those gaps the input to Round 2.
+3. Carry Round 1 findings into gap analysis, identify material unknowns, and make those gaps the input to Round 2.
 4. Ask Nebius for a strict, structured ten-dimension mentor assessment.
 5. Derive score, edge scores, verdict, and near-miss deterministically in application code.
 6. Return a scoped MVP, exclusions, 24–36 hour build plan, 60-second demo plan, and inspectable research trail.
@@ -27,7 +27,7 @@ The problem is not a lack of ideas. It is spending a scarce hackathon weekend on
 - A confirmed production Vercel → Render → Linkup → Nebius run completed end-to-end. Live provider failures remain visible and never fall back to fixtures.
 - Detailed mentor report: strengths, weaknesses, sources, novelty, adoption, feasibility, sponsor fit, stronger pivot, five-feature MVP, exclusions, 24-hour plan, and 60-second demo.
 - Inspectable 15-case mentor benchmark with misses disclosed.
-- Server-only Linkup and Nebius adapters, a Render Workflow task graph, D1 persistence, and validated external AI output.
+- Server-only Linkup and Nebius adapters, a Render Workflow task graph, optional D1 persistence in the local runner, and validated external AI output.
 
 ## Run locally
 
@@ -44,6 +44,7 @@ Quality checks:
 
 ```bash
 npm test
+npx tsc --noEmit
 npm run lint
 npm run build
 ```
@@ -60,7 +61,7 @@ flowchart LR
   G --> L2[Linkup: gap-directed follow-up]
   L2 --> N[Nebius: structured assessment]
   N --> S[Deterministic scoring]
-  S --> D[Persist idempotently]
+  S --> D[Return terminal report]
   D --> U
   A -. Demo Mode .-> F[Curated fixtures + local runner]
 ```
@@ -79,7 +80,9 @@ Hackathon Edge averages normalized novelty, feasibility, scope, demoability, and
 
 - **Linkup — research:** first-party target-event retrieval and a separate idea-landscape search feed gap analysis; each material unknown becomes a targeted Round 2 query. Sources, relevance, confidence, and unresolved unknowns remain inspectable.
 - **Nebius Token Factory — inference:** GLM-5.3-Flash produces the strict ten-dimension assessment in the main flow. PIVOT validates it with Zod, while application code—not the model—calculates the final scores and verdict.
-- **Render Workflows — orchestration:** seven child tasks preserve successful research across downstream work. Network, rate-limit, and provider errors retry at the smallest meaningful boundary; deterministic format errors fail fast; an idempotency key prevents duplicate reports.
+- **Render Workflows — orchestration:** seven child tasks preserve successful research across downstream work. Network, rate-limit, and provider errors retry at the smallest meaningful boundary; deterministic format errors fail fast; an idempotency key derives a stable analysis ID and deduplicates requests within the web process.
+
+Code evidence: [Linkup provider](providers/research/linkup.ts), [Render task graph](render-workflow/tasks.ts), [Render API adapter](workflows/render.ts), [Nebius provider](providers/inference/nebius.ts), [output validation](lib/schemas.ts), and [deterministic scoring](lib/scoring.ts).
 
 ## Live mode
 
@@ -90,7 +93,7 @@ Copy `.env.example` to `.env.local`, set the credentials below, and choose `APP_
 1. Create an account and API key at [app.linkup.so](https://app.linkup.so/).
 2. Set `LINKUP_API_KEY`.
 3. Start the app with `APP_MODE=live`.
-4. Run an analysis and confirm the Research Trail labels actual URLs as `LIVE SOURCE`.
+4. Run an analysis and inspect actual URLs and the `VERIFIED / FIRST-PARTY`, `RELEVANT EVIDENCE`, or `UNCERTAIN SOURCE` labels in the Research Trail.
 
 PIVOT calls Linkup separately for target-event evidence and the idea landscape. First-party event-domain results receive explicit provenance; missing tracks, criteria, sponsors, competitors, or adoption evidence become targeted Round 2 searches. The implementation uses the official `POST https://api.linkup.so/v1/search` endpoint with `searchResults`; see the [Linkup quickstart](https://docs.linkup.so/pages/documentation/get-started/quickstart).
 
@@ -100,7 +103,7 @@ PIVOT calls Linkup separately for target-event evidence and the idea landscape. 
 2. Set `NEBIUS_API_KEY`.
 3. Keep the default `NEBIUS_BASE_URL`, or change it for a compatible endpoint.
 4. Select a current JSON-capable model in Token Factory and set `NEBIUS_MODEL`.
-5. Run the 15 benchmark cases before a public demo and record actual latency/cost.
+5. Run a live analysis and inspect its structured assessment. The displayed benchmark is a checked-in fixture baseline, not a live benchmark runner.
 
 PIVOT sends the idea, constraints, hackathon context, both evidence rounds, gaps, and rubric to the OpenAI-compatible chat-completions endpoint. It requests JSON, extracts fenced or noisy JSON defensively, and validates the result with Zod. See [Nebius quickstart](https://docs.tokenfactory.nebius.com/quickstart) and [structured output guidance](https://docs.tokenfactory.nebius.com/ai-models-inference/json).
 
@@ -114,11 +117,13 @@ PIVOT sends the idea, constraints, hackathon context, both evidence rounds, gaps
 6. Create a Render API key, set it as `RENDER_API_KEY`, and set the task slug as `RENDER_WORKFLOW_ID` in the web app.
 7. Trigger once and inspect the chained tasks and retry boundaries in Render’s Runs view.
 
-In live mode, `/api/analyze` calls the official `POST https://api.render.com/v1/task-runs` endpoint with the positional input array `[analysisInput, idempotencyKey]`, polls `GET /v1/task-runs/{runId}` to a terminal state, and returns the workflow's report result. It never falls back to the local runner after a Render failure. Research and persistence children retain bounded retries; Nebius retries only transient network, 429, and 5xx failures inside its provider, while deterministic JSON/schema failures fail fast. The idempotency key also derives a stable analysis ID. See [workflow setup](https://render.com/docs/workflows-tutorial), [task definitions and retries](https://render.com/docs/workflows-defining), and [triggering runs](https://render.com/docs/workflows-running).
+In live mode, `/api/analyze` calls the official `POST https://api.render.com/v1/task-runs` endpoint with the positional input array `[analysisInput, idempotencyKey]`, polls `GET /v1/task-runs/{runId}` to a terminal state, and returns the workflow's report result. It never falls back to the local runner after a Render failure. Research and report-finalization children retain bounded retries; Nebius retries only transient network, 429, and 5xx failures inside its provider, while deterministic JSON/schema failures fail fast. The idempotency key also derives a stable analysis ID. See [workflow setup](https://render.com/docs/workflows-tutorial), [task definitions and retries](https://render.com/docs/workflows-defining), and [triggering runs](https://render.com/docs/workflows-running).
 
 ## Persistence
 
-D1 stores each analysis once and findings under a unique `analysisId:findingId` key. Upserts make retries safe. Local workflow results still return if persistence is temporarily unavailable. The generated migration is committed in `drizzle/`.
+The local runner optionally writes completed analyses and findings to D1, using upserts keyed by analysis ID and `analysisId:findingId`. Results still return if persistence is unavailable. The generated migration is committed in `drizzle/`.
+
+The live Render path carries research between tasks and returns the final report. Its `persist_report` task does not write to D1, and Round 1 has no separate database checkpoint. Request deduplication uses a bounded in-memory cache; it does not persist across web-process restarts.
 
 ## Mentor benchmark
 
@@ -129,7 +134,7 @@ The benchmark is intentionally labeled directional expert judgment, not objectiv
 - Web search can still miss, rank, or summarize imperfect evidence. PIVOT keeps unverified claims and missing first-party event evidence visible rather than treating retrieval as truth.
 - Model judgments remain judgments even when schema-valid. Deterministic scoring prevents internal arithmetic contradictions but does not make the rubric objective.
 - Demo evidence is curated fixture content and uses clearly non-public `demo-evidence.local` URLs; it is never presented as web research.
-- D1 persistence is device-independent when hosted, but there is intentionally no account/history interface.
+- D1 persistence is optional and limited to the local runner; the live Render path returns reports without database storage. There is no account/history interface.
 - Benchmark “ground truth” reflects mentor judgment; disagreement is disclosed rather than hidden.
 
 ## Tracks
@@ -139,4 +144,4 @@ The benchmark is intentionally labeled directional expert judgment, not objectiv
 - **Render / Workflows:** separate retryable steps, idempotency, visible failure recovery.
 - **NERDCONF / Fun Build:** a memorable casino decision terminal that teaches disciplined scope.
 
-See [track compliance](docs/TRACK-COMPLIANCE.md), [90-second and 2-minute demo scripts](docs/DEMO-SCRIPT.md), and [submission copy](docs/SUBMISSION.md).
+See [track compliance](docs/TRACK-COMPLIANCE.md), [30-, 60-, and 90-second demo scripts](docs/DEMO-SCRIPT.md), and [submission copy](docs/SUBMISSION.md).
